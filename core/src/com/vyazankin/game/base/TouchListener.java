@@ -9,7 +9,7 @@ import java.util.function.Predicate;
  * Интерфейс, позволяющий подписать объект на получение событий от BaseScreen
  */
 public interface TouchListener {
-    /**
+        /**
      *Обработка события отпускания кнопки/пада в мировой(игровой) системе координат
      */
     public void touchDown(Vector2 worldTouchPosition, int pointer, int button);
@@ -22,7 +22,7 @@ public interface TouchListener {
     /**
      * Обработка события протягивания в мировой(игровой) системе координат
      */
-    public void drag(Vector2 worldTouchPosition, int pointer);
+    public default void drag(Vector2 worldTouchPosition, int pointer){};
 
     /**
      * Проверка на попадание в необходимые координаты - должна быть переопределена для
@@ -30,7 +30,11 @@ public interface TouchListener {
      * При выполнении условия попадания(например, вектор попал в прямоугольную область) - возвращаем true
      * в этом случае BaseScreen отправит текущему Listenerу соответствуюшее событие
      */
-    //todo добавить дефолтную реализацию метода
-    public boolean isInBounds(Vector2 checkedPosition);
+    public default boolean isTouchDownInBounds(Vector2 checkedPosition){
+        return true;
+    };
 
+    public default boolean isTouchUpInBounds(Vector2 checkedPosition){
+        return true;
+    };
 }

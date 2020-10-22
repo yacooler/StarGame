@@ -6,7 +6,7 @@ import com.vyazankin.game.base.BaseSprite;
 import com.vyazankin.game.base.TouchListener;
 import com.vyazankin.game.math.Rect;
 
-public class Background extends BaseSprite implements TouchListener {
+public class Background extends BaseSprite{
 
     public Background(TextureRegion region) {
         super(region);
@@ -18,28 +18,4 @@ public class Background extends BaseSprite implements TouchListener {
         setCenterPosition(bounds.getCenterPosition());
     }
 
-    @Override
-    public void dispose() {
-
-    }
-
-    @Override
-    public void touchDown(Vector2 worldTouchPosition, int pointer, int button) {
-        System.out.println("Тачдаун " + worldTouchPosition);
-    }
-
-    @Override
-    public void touchUp(Vector2 worldTouchPosition, int pointer, int button) {
-        System.out.println("Тачап " + worldTouchPosition);
-    }
-
-    @Override
-    public void drag(Vector2 worldTouchPosition, int pointer) {
-        System.out.println("Драг " + worldTouchPosition);
-    }
-
-    @Override
-    public boolean isInBounds(Vector2 checkedPosition) {
-        return isVectorInside(checkedPosition);
-    }
 }

@@ -10,7 +10,7 @@ abstract public class BaseSprite extends Rect {
     protected float scale = 1f;
 
     protected TextureRegion[] textureRegions;
-    protected int currentFrame = -1;
+    protected int currentFrame = 0;
 
     private BaseSprite(){
         throw new UnsupportedOperationException("Нельзя создавать BaseSprite без параметров!");
@@ -19,7 +19,10 @@ abstract public class BaseSprite extends Rect {
     public BaseSprite(TextureRegion region){
         textureRegions = new TextureRegion[1];
         textureRegions[0] = region;
-        currentFrame = 0;
+    }
+
+    public BaseSprite(TextureRegion[] regions){
+        textureRegions = regions;
     }
 
     /**
