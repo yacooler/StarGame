@@ -114,7 +114,7 @@ public class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
         if (!touchListeners.isEmpty()){
             for (TouchListener l: touchListeners) {
-                if (l.isInBounds(worldTouchPosition)) l.touchDown(worldTouchPosition, pointer, button);
+                if (l.isTouchDownInBounds(worldTouchPosition)) l.touchDown(worldTouchPosition, pointer, button);
             }
         }
         return screenWorldTouchDown(worldTouchPosition, pointer, button);
@@ -125,7 +125,7 @@ public class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
         if (!touchListeners.isEmpty()){
             for (TouchListener l: touchListeners) {
-                if (l.isInBounds(worldTouchPosition))l.touchUp(worldTouchPosition, pointer, button);
+                if (l.isTouchUpInBounds(worldTouchPosition))l.touchUp(worldTouchPosition, pointer, button);
             }
         }
         return screenWorldTouchUp(worldTouchPosition, pointer, button);
@@ -136,7 +136,7 @@ public class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
         if (!touchListeners.isEmpty()){
             for (TouchListener l: touchListeners) {
-                if (l.isInBounds(worldTouchPosition)) l.drag(worldTouchPosition, pointer);
+                if (l.isTouchDownInBounds(worldTouchPosition)) l.drag(worldTouchPosition, pointer);
             }
         }
         return screenWorldTouchDragged(worldTouchPosition, pointer);
