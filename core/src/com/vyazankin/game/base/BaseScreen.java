@@ -114,6 +114,7 @@ public class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
         if (!touchListeners.isEmpty()){
             for (TouchListener l: touchListeners) {
+                //Проверка на тачдаун
                 if (l.isTouchDownInBounds(worldTouchPosition)) l.touchDown(worldTouchPosition, pointer, button);
             }
         }
@@ -125,6 +126,7 @@ public class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
         if (!touchListeners.isEmpty()){
             for (TouchListener l: touchListeners) {
+                //Проверка на тачап
                 if (l.isTouchUpInBounds(worldTouchPosition))l.touchUp(worldTouchPosition, pointer, button);
             }
         }
@@ -136,6 +138,7 @@ public class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
         if (!touchListeners.isEmpty()){
             for (TouchListener l: touchListeners) {
+                //Проверка на тачдаун
                 if (l.isTouchDownInBounds(worldTouchPosition)) l.drag(worldTouchPosition, pointer);
             }
         }
