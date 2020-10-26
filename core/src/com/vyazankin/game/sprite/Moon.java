@@ -3,11 +3,9 @@ package com.vyazankin.game.sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.base.BaseSprite;
-import com.vyazankin.game.base.TouchListener;
+import com.vyazankin.game.base.InputListener;
 
-import static java.lang.Math.*;
-
-public class Moon extends BaseSprite implements TouchListener {
+public class Moon extends BaseSprite implements InputListener {
 
     private Vector2 velocity = new Vector2(0,0);
     private Vector2 temporary = new Vector2(0,0);

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 
-public abstract class BaseButton extends BaseSprite implements TouchListener{
+public abstract class BaseButton extends BaseSprite implements InputListener {
 
     private int pointer = 0;
     private Vector2 touchedPosition;

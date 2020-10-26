@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.vyazankin.game.base.BaseScreen;
 import com.vyazankin.game.base.BaseSprite;
+import com.vyazankin.game.math.Rect;
 import com.vyazankin.game.sprite.Background;
 import com.vyazankin.game.sprite.PlayerSpaceShip;
 import com.vyazankin.game.sprite.Star;
@@ -25,6 +26,8 @@ public class GameScreen extends BaseScreen {
     private final int STARS_COUNT = 64;
 
     private PlayerSpaceShip spaceShip;
+
+
 
     public GameScreen(Game game) {
         super(game);

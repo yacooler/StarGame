@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 /**
  * Интерфейс, позволяющий подписать объект на получение событий от BaseScreen
  */
-public interface TouchListener {
+public interface InputListener {
         /**
      *Обработка события отпускания кнопки/пада в мировой(игровой) системе координат
      */
@@ -37,4 +37,21 @@ public interface TouchListener {
     public default boolean isTouchUpInBounds(Vector2 checkedPosition){
         return true;
     };
+
+
+    //Кнопки клавиатуры
+    public default boolean keyDown(int keycode) {
+        return false;
+    }
+
+    public default boolean keyUp(int keycode) {
+        return false;
+    }
+
+    public default boolean keyTyped(char character) {
+        return false;
+    }
+
+
+
 }

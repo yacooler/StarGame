@@ -3,17 +3,17 @@ package com.vyazankin.game.sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.base.BaseSprite;
-import com.vyazankin.game.base.TouchListener;
+import com.vyazankin.game.base.InputListener;
 import com.vyazankin.game.math.Rect;
 
-public class PlayerSpaceShip extends BaseSprite implements TouchListener {
+public class PlayerSpaceShip extends BaseSprite implements InputListener {
 
     private Rect worldBounds;
     private final float SHIP_SIZE = 0.1f;
     private Vector2 velocity;
     private Vector2 destinationPosition;
     private Vector2 temporary;
-    private float velocityMul = 0.01f;
+    private float velocityConst = 0.01f;
 
     public PlayerSpaceShip(TextureRegion region) {
         super(region);
@@ -28,7 +28,7 @@ public class PlayerSpaceShip extends BaseSprite implements TouchListener {
         super.worldResize(bounds);
         worldBounds = bounds;
         setHeightProportion(SHIP_SIZE);
-        setCenterPosition(bounds.getCenterPosition().x, bounds.getBottom() + SHIP_SIZE / 2f);
+        setBottom(bounds.getBottom() + SHIP_SIZE / 3);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class PlayerSpaceShip extends BaseSprite implements TouchListener {
         temporary.set(worldTouchPosition);
         temporary.sub(getCenterPosition()).nor();
         destinationPosition = worldTouchPosition;
-        velocity.set(temporary.scl(velocityMul));
+        velocity.set(temporary.scl(velocityConst));
     }
 
     @Override
@@ -53,11 +53,24 @@ public class PlayerSpaceShip extends BaseSprite implements TouchListener {
 
             setCenterPosition(getCenterPosition().add(velocity));
 
-            if (temporary.set(destinationPosition).sub(getCenterPosition()).len() < velocityMul){
+            if (temporary.set(destinationPosition).sub(getCenterPosition()).len() < velocityConst){
                 setCenterPosition(destinationPosition);
                 destinationPosition = null;
             }
 
         }
     }
+
+    public void moveLeft(){
+        velocity.x = -velocityConst;
+    }
+
+    public void moveRight(){
+        velocity.x = velocityConst;
+    }
+
+    public void stop(){
+        velocity.setZero();
+    }
+
 }

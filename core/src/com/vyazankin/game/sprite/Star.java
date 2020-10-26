@@ -11,7 +11,7 @@ public class Star extends BaseSprite {
 
     private Vector2 velocity;
     private float size;
-    private Rect worldBounds;
+
 
     public Star(TextureRegion region) {
         super(region);
@@ -20,28 +20,29 @@ public class Star extends BaseSprite {
     @Override
     public void worldResize(Rect bounds) {
         super.worldResize(bounds);
-        worldBounds = bounds;
+
         setCenterPosition(RandomBounds.getRandom(bounds));
-        size = RandomBounds.getRandom(0.005f, 0.01f);
-        velocity = new Vector2(RandomBounds.getRandom(-0.001f, 0.001f), -0.01f).scl(size * 30f);
+        size = RandomBounds.getRandom(0.001f, 0.01f);
+        velocity = new Vector2(RandomBounds.getRandom(-0.0001f, 0.0001f), -0.01f).scl(size * 3000f);
         setHeightProportion(size);
     }
 
     @Override
     public void recalc(float deltaTime) {
+
         super.recalc(deltaTime);
-        setCenterPosition(getCenterPosition().add(velocity));
+        setCenterPosition(getCenterPosition().mulAdd(velocity, deltaTime));
 
-        if (getRight() < worldBounds.getLeft()){
-            setLeft(worldBounds.getRight());
+        if (getRight() < getActualWorldBound().getLeft()){
+            setLeft(getActualWorldBound().getRight());
         }
 
-        if (getLeft() > worldBounds.getRight()){
-            setRight(worldBounds.getLeft());
+        if (getLeft() > getActualWorldBound().getRight()){
+            setRight(getActualWorldBound().getLeft());
         }
 
-        if (getTop() < worldBounds.getBottom()){
-            setBottom(worldBounds.getTop());
+        if (getTop() < getActualWorldBound().getBottom()){
+            setBottom(getActualWorldBound().getTop());
         }
     }
 }

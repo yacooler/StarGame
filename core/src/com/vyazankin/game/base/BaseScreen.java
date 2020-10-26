@@ -12,13 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.math.MatrixUtils;
 import com.vyazankin.game.math.Rect;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class BaseScreen implements Screen, InputProcessor {
 
@@ -42,7 +37,7 @@ public class BaseScreen implements Screen, InputProcessor {
     //Вектор последней операции touch/drag в мировой системе координат
     protected Vector2 worldTouchPosition;
 
-    protected Set<TouchListener> touchListeners = new LinkedHashSet<>();
+    protected Set<InputListener> inputListeners = new LinkedHashSet<>();
     protected Set<BaseSprite> sprites = new LinkedHashSet<>();
 
     //Ссылка на класс игры
@@ -109,6 +104,7 @@ public class BaseScreen implements Screen, InputProcessor {
         }
     }
 
+
     @Override
     public void pause() {
         //doNothing
@@ -135,24 +131,39 @@ public class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        if (!inputListeners.isEmpty()){
+            for (InputListener l: inputListeners) {
+                l.keyDown(keycode);
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean keyUp(int keycode) {
+    public boolean keyUp(int keycode){
+        if (!inputListeners.isEmpty()){
+            for (InputListener l: inputListeners) {
+                l.keyUp(keycode);
+            }
+        }
         return false;
     }
 
     @Override
     public boolean keyTyped(char character) {
+        if (!inputListeners.isEmpty()){
+            for (InputListener l: inputListeners) {
+                l.keyTyped(character);
+            }
+        }
         return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
-        if (!touchListeners.isEmpty()){
-            for (TouchListener l: touchListeners) {
+        if (!inputListeners.isEmpty()){
+            for (InputListener l: inputListeners) {
                 //Проверка на тачдаун
                 if (l.isTouchDownInBounds(worldTouchPosition)) l.touchDown(worldTouchPosition, pointer, button);
             }
@@ -163,8 +174,8 @@ public class BaseScreen implements Screen, InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button){
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
-        if (!touchListeners.isEmpty()){
-            for (TouchListener l: touchListeners) {
+        if (!inputListeners.isEmpty()){
+            for (InputListener l: inputListeners) {
                 //Проверка на тачап
                 if (l.isTouchUpInBounds(worldTouchPosition))l.touchUp(worldTouchPosition, pointer, button);
             }
@@ -175,8 +186,8 @@ public class BaseScreen implements Screen, InputProcessor {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         worldTouchPosition.set(screenX, Gdx.graphics.getHeight() - screenY).mul(screen2worldTransition);
-        if (!touchListeners.isEmpty()){
-            for (TouchListener l: touchListeners) {
+        if (!inputListeners.isEmpty()){
+            for (InputListener l: inputListeners) {
                 //Проверка на тачдаун
                 if (l.isTouchDownInBounds(worldTouchPosition)) l.drag(worldTouchPosition, pointer);
             }
@@ -223,11 +234,12 @@ public class BaseScreen implements Screen, InputProcessor {
 
     }
 
-    public void addTouchListener(TouchListener listener){
-        touchListeners.add(listener);
+    public void addTouchListener(InputListener listener){
+        inputListeners.add(listener);
     }
 
-    public void removeTouchListener(TouchListener listener) {touchListeners.remove(listener);}
+    public void removeTouchListener(InputListener listener) {
+        inputListeners.remove(listener);}
 
     public void addSprite(BaseSprite sprite) {sprites.add(sprite);}
 
@@ -236,8 +248,8 @@ public class BaseScreen implements Screen, InputProcessor {
      */
     public void removeSprite(BaseSprite sprite) {
         sprites.remove(sprite);
-        if (sprite instanceof TouchListener){
-            removeTouchListener((TouchListener) sprite);
+        if (sprite instanceof InputListener){
+            removeTouchListener((InputListener) sprite);
         }
     }
 
@@ -247,5 +259,12 @@ public class BaseScreen implements Screen, InputProcessor {
     public void removeAndDisposeSprite(BaseSprite sprite) {
         removeSprite(sprite);
         sprite.dispose();
+    }
+
+    /**
+     * Получение текущих границ экрана
+     */
+    public Rect getActualWorldBound(){
+        return worldBounds;
     }
 }

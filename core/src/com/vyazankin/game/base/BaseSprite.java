@@ -11,6 +11,7 @@ abstract public class BaseSprite extends Rect {
 
     protected TextureRegion[] textureRegions;
     protected int currentFrame = 0;
+    protected Rect actualWorldBound;
 
     private BaseSprite(){
         throw new UnsupportedOperationException("Нельзя создавать BaseSprite без параметров!");
@@ -52,7 +53,13 @@ abstract public class BaseSprite extends Rect {
         this.currentFrame = currentFrame;
     }
 
-    public void worldResize(Rect bounds){};
+    public void worldResize(Rect bounds){
+        actualWorldBound = bounds;
+    };
+
+    public Rect getActualWorldBound() {
+        return actualWorldBound;
+    }
 
     /**
      * Освобождаем текстуры
