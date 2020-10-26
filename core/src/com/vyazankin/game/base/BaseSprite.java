@@ -48,14 +48,20 @@ abstract public class BaseSprite extends Rect {
                 angle);
     };
 
+    public void setCurrentFrame(int currentFrame) {
+        this.currentFrame = currentFrame;
+    }
+
     public void worldResize(Rect bounds){};
 
     /**
      * Освобождаем текстуры
      */
     public void dispose(){
-        for (TextureRegion region: textureRegions) {
-            region.getTexture().dispose();
+        if (textureRegions!=null) {
+            for (TextureRegion region : textureRegions) {
+                if (region!=null && region.getTexture() != null) region.getTexture().dispose();
+            }
         }
         textureRegions = null;
     };

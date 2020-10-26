@@ -30,13 +30,12 @@ public class Moon extends BaseSprite implements TouchListener {
         temporary.sub(getCenterPosition()).nor();
         destinationPosition = worldTouchPosition;
         velocity.set(temporary.scl(velocityMul));
-        System.out.println(velocity);
     }
 
     @Override
     public void recalc(float deltaTime) {
 
-        angle += 0.1f;
+        angle += 0.5f;
         if (angle > 360f) angle = 0;
 
         if (null != destinationPosition){
@@ -49,8 +48,6 @@ public class Moon extends BaseSprite implements TouchListener {
             }
 
         }
-
-
 
     }
 }

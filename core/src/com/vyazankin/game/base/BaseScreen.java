@@ -1,5 +1,6 @@
 package com.vyazankin.game.base;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -12,32 +13,53 @@ import com.vyazankin.game.math.MatrixUtils;
 import com.vyazankin.game.math.Rect;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class BaseScreen implements Screen, InputProcessor {
 
     protected SpriteBatch batch;
 
     //Размер экрана в пикселях
-    private Rect screenBoundsPX;
+    protected Rect screenBoundsPX;
 
     //Мировая(игровая) система координат (-1..1 / proportion)
-    private Rect worldBounds;
+    protected Rect worldBounds;
 
     //OpenGL система координат 0..2f/0..2f
-    private Rect openGLBounds;
+    protected Rect openGLBounds;
 
     //Матрица перевода из игровых координат в OpenGL для отображения
-    private Matrix4 world2openGLTransition;
+    protected Matrix4 world2openGLTransition;
 
     //Матрица перевода экранных координат в игровые
-    private Matrix3 screen2worldTransition;
+    protected Matrix3 screen2worldTransition;
 
     //Вектор последней операции touch/drag в мировой системе координат
-    private Vector2 worldTouchPosition;
+    protected Vector2 worldTouchPosition;
 
-    private List<TouchListener> touchListeners = new LinkedList<>();
+    protected Set<TouchListener> touchListeners = new LinkedHashSet<>();
+    protected Set<BaseSprite> sprites = new LinkedHashSet<>();
+
+    //Ссылка на класс игры
+    protected Game game;
+
+
+    private BaseScreen(){
+        throw new UnsupportedOperationException("Запрещен вызов конструктора экрана без параметров!");
+    }
+
+    public BaseScreen(Game game) {
+        this.game = game;
+    }
+
+    public Game getGame() {
+        return game;
+    }
 
     @Override
     public void show() {
@@ -55,6 +77,14 @@ public class BaseScreen implements Screen, InputProcessor {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.03f, 0.03f, 0.03f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        //Команда спрайтам
+        for (BaseSprite s: sprites){
+            s.recalc(delta);
+            batch.begin();
+            s.draw(batch);
+            batch.end();
+        }
     }
 
     @Override
@@ -72,6 +102,11 @@ public class BaseScreen implements Screen, InputProcessor {
         MatrixUtils.calculateTransitionMatrix(screen2worldTransition, screenBoundsPX, worldBounds);
 
         worldResize(worldBounds);
+
+        //Команда спрайтам
+        for (BaseSprite s: sprites){
+            s.worldResize(worldBounds);
+        }
     }
 
     @Override
@@ -91,6 +126,10 @@ public class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
+        //Диспозим спрайты
+        for (BaseSprite s: sprites) {
+            s.dispose();
+        }
         batch.dispose();
     }
 
@@ -189,4 +228,24 @@ public class BaseScreen implements Screen, InputProcessor {
     }
 
     public void removeTouchListener(TouchListener listener) {touchListeners.remove(listener);}
+
+    public void addSprite(BaseSprite sprite) {sprites.add(sprite);}
+
+    /**
+     * Исключение спрайта из списка обрабатываемых на текущем экране
+     */
+    public void removeSprite(BaseSprite sprite) {
+        sprites.remove(sprite);
+        if (sprite instanceof TouchListener){
+            removeTouchListener((TouchListener) sprite);
+        }
+    }
+
+    /**
+     * Полное удаление спрайта
+     */
+    public void removeAndDisposeSprite(BaseSprite sprite) {
+        removeSprite(sprite);
+        sprite.dispose();
+    }
 }
