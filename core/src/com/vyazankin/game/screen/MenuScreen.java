@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.vyazankin.game.base.BaseButton;
 import com.vyazankin.game.base.BaseScreen;
 import com.vyazankin.game.base.BaseSprite;
@@ -41,12 +40,14 @@ public class MenuScreen extends BaseScreen {
 
         background = new Background(new TextureRegion(new Texture("images/textures/background.jpg")));
 
+
         closeButton = new BaseButton(new TextureRegion(menuAtlas.findRegion("btExit"))) {
             @Override
             public void action() {
                 Gdx.app.exit();
             };
         };
+
 
         playButton = new BaseButton(new TextureRegion(menuAtlas.findRegion("btPlay"))) {
             @Override
@@ -57,23 +58,23 @@ public class MenuScreen extends BaseScreen {
         };
 
         //Спрайты отрисовываются в последовательности добавления!
-        addSprite(background);
+        addSpriteToDefaultPool(background, true);
 
         stars = new ArrayList<>(STARS_COUNT);
         for (int i = 0; i < STARS_COUNT; i++) {
             Star star;
             star = new Star(new TextureRegion(menuAtlas.findRegion("star")));
             stars.add(star);
-            addSprite(star);
+            addSpriteToDefaultPool(star, true);
         }
 
-        addTouchListener(closeButton);
-        addTouchListener(playButton);
+        addInputListener(closeButton);
+        addInputListener(playButton);
 
 
         //Отрисовываются в последовательности добавления!
-        addSprite(closeButton);
-        addSprite(playButton);
+        addSpriteToDefaultPool(closeButton, true);
+        addSpriteToDefaultPool(playButton, true);
 
     }
 

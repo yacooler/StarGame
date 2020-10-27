@@ -12,9 +12,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.math.MatrixUtils;
 import com.vyazankin.game.math.Rect;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
+
+/**
+ * Класс, описывающий базовый экран игры
+ */
 public class BaseScreen implements Screen, InputProcessor {
 
     protected SpriteBatch batch;
@@ -38,11 +44,16 @@ public class BaseScreen implements Screen, InputProcessor {
     protected Vector2 worldTouchPosition;
 
     protected Set<InputListener> inputListeners = new LinkedHashSet<>();
-    protected Set<BaseSprite> sprites = new LinkedHashSet<>();
+    //protected Set<BaseSprite> sprites = new LinkedHashSet<>();
+
+    //В спрайт-пул по умолчанию добавляются спрайты фона и другие одиночные спрайты
+    private BaseSpritePool<BaseSprite> defaultSpritePool;
+
+    //Спрайт-пулы конкретных объектов
+    private List<BaseSpritePool<? extends BaseSprite>> baseSpritePoolList;
 
     //Ссылка на класс игры
     protected Game game;
-
 
     private BaseScreen(){
         throw new UnsupportedOperationException("Запрещен вызов конструктора экрана без параметров!");
@@ -56,6 +67,42 @@ public class BaseScreen implements Screen, InputProcessor {
         return game;
     }
 
+    /*------------------------------------------Секция работы со спрайтами-----------------------------*/
+
+    /**
+     * Добавление спрайта в пул по умолчанию
+     * @param sprite
+     */
+    public void addSpriteToDefaultPool(BaseSprite sprite) {
+        defaultSpritePool.addSpriteIntoActive(sprite);
+    }
+
+    public void addSpriteToDefaultPool(BaseSprite sprite, boolean active) {
+        defaultSpritePool.addSpriteIntoActive(sprite);
+        sprite.setActive(active);
+    }
+
+    /**
+     * Исключение спрайта из пула по умолчанию (включая исключение из листнеров!)
+     */
+    public void removeSprite(BaseSprite sprite) {
+        defaultSpritePool.removeSprite(sprite);
+        if (sprite instanceof InputListener){
+            removeInputListener((InputListener) sprite);
+        }
+    }
+
+    /*------------------------------------------Секция работы с пулами -----------------------------*/
+    public void addSpritePool(BaseSpritePool pool){
+        baseSpritePoolList.add(pool);
+    }
+
+
+    public void removeSpritePool(BaseSpritePool pool){
+        baseSpritePoolList.remove(pool);
+    }
+
+
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -66,6 +113,19 @@ public class BaseScreen implements Screen, InputProcessor {
         world2openGLTransition = new Matrix4();
         screen2worldTransition = new Matrix3();
         worldTouchPosition = new Vector2();
+
+        //Для хранения спрайтов, не требующих повторного использования
+        defaultSpritePool = new BaseSpritePool<BaseSprite>() {
+            @Override
+            protected BaseSprite obtainSprite() {
+                throw new UnsupportedOperationException("Запрещено динамическое добавление спрайтов в пул по умолчанию!");
+            }
+        };
+
+        //Для хранения пулов спрайтов
+        baseSpritePoolList = new ArrayList<>();
+        addSpritePool(defaultSpritePool);
+
     }
 
     @Override
@@ -73,14 +133,20 @@ public class BaseScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0.03f, 0.03f, 0.03f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //Команда спрайтам
-        for (BaseSprite s: sprites){
-            s.recalc(delta);
-            batch.begin();
-            s.draw(batch);
-            batch.end();
+        //Пересчитываем пулы
+        for (BaseSpritePool pool: baseSpritePoolList) {
+            pool.recalc(delta);
         }
+
+        //Отрисовываем пулы
+        batch.begin();
+        for (BaseSpritePool pool: baseSpritePoolList) {
+            pool.draw(batch);
+        }
+        batch.end();
+
     }
+
 
     @Override
     public void resize(int width, int height) {
@@ -98,11 +164,20 @@ public class BaseScreen implements Screen, InputProcessor {
 
         worldResize(worldBounds);
 
-        //Команда спрайтам
-        for (BaseSprite s: sprites){
-            s.worldResize(worldBounds);
+        //Команда спрайтам в пулах
+        for (BaseSpritePool pool: baseSpritePoolList) {
+            pool.worldResize(worldBounds);
         }
+        //defaultSpritePool.worldResize(worldBounds);
     }
+
+    /**
+     * Получение текущих границ экрана
+     */
+    public Rect getActualWorldBound(){
+        return worldBounds;
+    }
+
 
 
     @Override
@@ -123,11 +198,24 @@ public class BaseScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         //Диспозим спрайты
-        for (BaseSprite s: sprites) {
-            s.dispose();
+        for (BaseSpritePool pool : baseSpritePoolList){
+            pool.dispose();
         }
         batch.dispose();
     }
+
+
+    /*-------------------------------Секция перехвата input - событий-------------------------------------------*/
+
+    //Добавление слушателя в пул подписчиков
+    public void addInputListener(InputListener listener){
+        inputListeners.add(listener);
+    }
+
+    //Исключение слушателя из пула подписчиков
+    public void removeInputListener(InputListener listener) {
+        inputListeners.remove(listener);}
+
 
     @Override
     public boolean keyDown(int keycode) {
@@ -230,41 +318,8 @@ public class BaseScreen implements Screen, InputProcessor {
     /**
      * Событие ресайз в мировой(игровой) системе координат
      */
-    public void worldResize(Rect bounds){
+    protected void worldResize(Rect bounds){}
 
-    }
 
-    public void addTouchListener(InputListener listener){
-        inputListeners.add(listener);
-    }
 
-    public void removeTouchListener(InputListener listener) {
-        inputListeners.remove(listener);}
-
-    public void addSprite(BaseSprite sprite) {sprites.add(sprite);}
-
-    /**
-     * Исключение спрайта из списка обрабатываемых на текущем экране
-     */
-    public void removeSprite(BaseSprite sprite) {
-        sprites.remove(sprite);
-        if (sprite instanceof InputListener){
-            removeTouchListener((InputListener) sprite);
-        }
-    }
-
-    /**
-     * Полное удаление спрайта
-     */
-    public void removeAndDisposeSprite(BaseSprite sprite) {
-        removeSprite(sprite);
-        sprite.dispose();
-    }
-
-    /**
-     * Получение текущих границ экрана
-     */
-    public Rect getActualWorldBound(){
-        return worldBounds;
-    }
 }
