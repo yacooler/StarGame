@@ -24,7 +24,7 @@ public class MenuScreen extends BaseScreen {
     private List<BaseSprite> stars;
 
     private TextureAtlas menuAtlas;
-    private final int STARS_COUNT = 256;
+    private final int STARS_COUNT = 1256;
 
 
     public MenuScreen(Game game) {
@@ -36,9 +36,9 @@ public class MenuScreen extends BaseScreen {
     public void show() {
         super.show();
 
-        menuAtlas = new TextureAtlas("images/textures/menuAtlas.tpack");
+        menuAtlas = new TextureAtlas("resources/textures/menuAtlas.tpack");
 
-        background = new Background(new TextureRegion(new Texture("images/textures/background.jpg")));
+        background = new Background(new TextureRegion(new Texture("resources/textures/background.jpg")));
 
 
         closeButton = new BaseButton(new TextureRegion(menuAtlas.findRegion("btExit"))) {

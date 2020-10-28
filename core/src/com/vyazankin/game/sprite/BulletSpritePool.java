@@ -7,7 +7,7 @@ public class BulletSpritePool extends BaseSpritePool<Bullet> {
     protected Bullet obtainSprite() {
         Bullet bullet = new Bullet();
 
-        System.out.printf("active/inactive %d/%d \n", getActiveSpritesList().size(), getInactiveSpritesList().size()  );
+        //System.out.printf("active/inactive %d/%d \n", getActiveSpritesList().size(), getInactiveSpritesList().size()  );
 
         return bullet;
     }

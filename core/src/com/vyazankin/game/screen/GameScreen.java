@@ -42,10 +42,10 @@ public class GameScreen extends BaseScreen {
         addSpritePool(bulletSpritePool);
 
 
-        menuAtlas = new TextureAtlas("images/textures/menuAtlas.tpack");
-        mainAtlas = new TextureAtlas("images/textures/mainAtlas.tpack");
+        menuAtlas = new TextureAtlas("resources/textures/menuAtlas.tpack");
+        mainAtlas = new TextureAtlas("resources/textures/mainAtlas.tpack");
 
-        background = new Background(new TextureRegion(new Texture("images/textures/background.jpg")));
+        background = new Background(new TextureRegion(new Texture("resources/textures/background.jpg")));
 
         addSpriteToDefaultPool(background, true);
 

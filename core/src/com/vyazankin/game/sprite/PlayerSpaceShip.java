@@ -1,6 +1,8 @@
 package com.vyazankin.game.sprite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -34,6 +36,8 @@ public class PlayerSpaceShip extends BaseSprite implements InputListener {
 
     private TextureAtlas mainAtlas;
 
+    Sound shootSound;
+
 
     public PlayerSpaceShip(TextureRegion region, BulletSpritePool bulletSpritePool) {
         super(region);
@@ -41,7 +45,12 @@ public class PlayerSpaceShip extends BaseSprite implements InputListener {
         velocity = new Vector2(0,0);
         this.bulletSpritePool = bulletSpritePool;
 
-        mainAtlas = new TextureAtlas("images/textures/mainAtlas.tpack");
+        mainAtlas = new TextureAtlas("resources/textures/mainAtlas.tpack");
+
+        //Для звуков выстрела
+        shootSound =  Gdx.audio.newSound(Gdx.files.internal("resources/sounds/bullet.wav"));
+
+
     }
 
 
@@ -189,7 +198,16 @@ public class PlayerSpaceShip extends BaseSprite implements InputListener {
         bullet.setActive(true);
         //Положили в активные, оттуда она исчезнет по своему внутреннему условию
         bulletSpritePool.addSpriteIntoActive(bullet);
+
+        //Звук выстрела
+        long soundId = shootSound.play();
+        shootSound.setVolume(soundId, 0.04f);
+
     }
 
-
+    @Override
+    public void dispose() {
+        shootSound.dispose();
+        super.dispose();
+    }
 }
