@@ -2,28 +2,52 @@ package com.vyazankin.game.base;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.math.Rect;
 
 
 abstract public class BaseSprite extends Rect {
+
+    protected boolean isActive;
+
     protected float angle;
     protected float scale = 1f;
 
     protected TextureRegion[] textureRegions;
     protected int currentFrame = 0;
     protected Rect actualWorldBound;
+    protected boolean initialized;
 
-    private BaseSprite(){
-        throw new UnsupportedOperationException("Нельзя создавать BaseSprite без параметров!");
+    public BaseSprite(){
+        //Конструктор для спрайта, используемого в пуле
+        //initialized = false
     }
 
     public BaseSprite(TextureRegion region){
         textureRegions = new TextureRegion[1];
         textureRegions[0] = region;
+
+        initialized = true;
     }
 
     public BaseSprite(TextureRegion[] regions){
         textureRegions = regions;
+
+        initialized = true;
+    }
+
+    public void set(TextureRegion region,
+                    int currentFrame,
+                    Vector2 centerPosition,
+                    float highProportion){
+
+        if (textureRegions == null) textureRegions = new TextureRegion[1];
+        textureRegions[0] = region;
+        this.currentFrame = currentFrame;
+        setCenterPosition(centerPosition);
+        setHeightProportion(highProportion);
+
+        initialized = true;
     }
 
     /**
@@ -35,11 +59,30 @@ abstract public class BaseSprite extends Rect {
         setWidth(height * textureRegions[currentFrame].getRegionWidth() / (float) textureRegions[currentFrame].getRegionHeight());
     }
 
+
+    /**
+     * Признак активности спрайта
+     */
+    public boolean isActive() {
+        return isActive;
+    }
+
+    /**
+     * Признак активности спрайта
+     */
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     /**
      * Должен быть вызван для отрисовки спрайта baseScreen
      * @param batch
      */
     public void draw(Batch batch){
+
+        if (!initialized) throw new IllegalArgumentException("Перед использованием спрайта он должен быть инициализирован! " + this);
+
+        if (!isActive) return;
         batch.draw(
                 textureRegions[currentFrame],
                 getLeft(),      getBottom(),
@@ -53,9 +96,13 @@ abstract public class BaseSprite extends Rect {
         this.currentFrame = currentFrame;
     }
 
-    public void worldResize(Rect bounds){
-        actualWorldBound = bounds;
-    };
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
 
     public Rect getActualWorldBound() {
         return actualWorldBound;
@@ -73,19 +120,22 @@ abstract public class BaseSprite extends Rect {
         textureRegions = null;
     };
 
+
+
+    protected void worldResize(Rect bounds){
+        actualWorldBound = bounds;
+    };
+
+
     /**
      * Должен быть вызван из метода render baseScreen
      * @param deltaTime - дельта времени, к которой могут быть привязаны расчеты
      */
-    public void recalc(float deltaTime){};
+    protected void recalc(float deltaTime){
+        if (!initialized) throw new IllegalArgumentException("Перед использованием спрайта он должен быть инициализирован! " + this);
+    };
 
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
 
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
 
 
 }
