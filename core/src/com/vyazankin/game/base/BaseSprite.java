@@ -15,7 +15,7 @@ abstract public class BaseSprite extends Rect {
 
     protected TextureRegion[] textureRegions;
     protected int currentFrame = 0;
-    protected Rect actualWorldBound;
+    protected Rect actualSpriteWorldBound;
     protected boolean initialized;
 
     public BaseSprite(){
@@ -36,10 +36,10 @@ abstract public class BaseSprite extends Rect {
         initialized = true;
     }
 
-    public void set(TextureRegion region,
-                    int currentFrame,
-                    Vector2 centerPosition,
-                    float highProportion){
+    public void setSpriteParams(TextureRegion region,
+                                int currentFrame,
+                                Vector2 centerPosition,
+                                float highProportion){
 
         if (textureRegions == null) textureRegions = new TextureRegion[1];
         textureRegions[0] = region;
@@ -49,6 +49,7 @@ abstract public class BaseSprite extends Rect {
 
         initialized = true;
     }
+
 
     /**
      * Установка размеров в процентном отношении относительно размера экрана
@@ -104,8 +105,8 @@ abstract public class BaseSprite extends Rect {
         this.scale = scale;
     }
 
-    public Rect getActualWorldBound() {
-        return actualWorldBound;
+    public Rect getActualSpriteWorldBound() {
+        return actualSpriteWorldBound;
     }
 
     /**
@@ -123,7 +124,7 @@ abstract public class BaseSprite extends Rect {
 
 
     protected void worldResize(Rect bounds){
-        actualWorldBound = bounds;
+        actualSpriteWorldBound = bounds;
     };
 
 
