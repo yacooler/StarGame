@@ -37,20 +37,23 @@ public class GameScreen extends BaseScreen {
         super(game);
     }
 
-    private int enemytimer = 100;
-
     private EnemyShipPooler enemyShipPooler;
 
-    private int MAX_SHIPS = 5;
+    private int MAX_SHIPS = 15;
 
+    Sound shootSound;
+    Sound enemyShootSound;
     @Override
     public void show() {
         super.show();
 
-        Sound shootSound =  Gdx.audio.newSound(Gdx.files.internal("resources/sounds/bullet.wav"));
+        shootSound =  Gdx.audio.newSound(Gdx.files.internal("resources/sounds/laser.wav"));
+        enemyShootSound = Gdx.audio.newSound(Gdx.files.internal("resources/sounds/bullet.wav"));
 
         //Пул спрайтов - пуль
         bulletSpritePool = new BulletSpritePool();
+
+        //Добавляем пул в список пулов. По ним происходит автоматическое итерирование и вызов необходимых методов
         addSpritePool(bulletSpritePool);
 
 
@@ -60,13 +63,15 @@ public class GameScreen extends BaseScreen {
 
         background = new Background(new TextureRegion(new Texture("resources/textures/background.jpg")));
 
+        //Пул по умолчанию
         addSpriteToDefaultPool(background, true);
 
-
-        enemyShipPooler = new EnemyShipPooler(mainAtlas, bulletSpritePool, shootSound);
+        //Пуллер кораблей - класс, отвечающий за создание вражеских кораблей. Наследуется от BaseSpritePool
+        enemyShipPooler = new EnemyShipPooler(mainAtlas, bulletSpritePool, enemyShootSound);
         addSpritePool(enemyShipPooler);
 
 
+        //Пролетающие на заднем фоне звёзды находятся в пуле по умолчанию
         stars = new ArrayList<>(STARS_COUNT);
         for (int i = 0; i < STARS_COUNT; i++) {
             Star star;
@@ -76,6 +81,7 @@ public class GameScreen extends BaseScreen {
         }
 
 
+        //Корабль игрока, находится в пуле по умолчанию
         spaceShip = new PlayerSpaceShip(mainAtlas, bulletSpritePool, shootSound);
 
         addSpriteToDefaultPool(spaceShip, true);
@@ -115,6 +121,8 @@ public class GameScreen extends BaseScreen {
     @Override
     public void dispose() {
         super.dispose();
+        shootSound.dispose();
+        enemyShootSound.dispose();
     }
 
 

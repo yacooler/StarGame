@@ -18,11 +18,11 @@ public abstract class BaseShip extends BaseSprite {
 
     //Параметры стрельбы
     //Выстрелов в секунду
-    private float bullet_velocity;
-    private float bullet_size;
-    private int   bullet_damage;
-    protected float fire_delay_timer;
-
+    private float bulletVelocity;
+    private float bulletSize;
+    private int bulletDamage;
+    protected float fireDelayTimer;
+    private float shootSoundVolume;
 
     //Общие пулы и ресурсы (не удаляем вместе с кораблем)
     protected BulletSpritePool bulletSpritePool;
@@ -50,25 +50,27 @@ public abstract class BaseShip extends BaseSprite {
             float ship_size,
             float ship_max_velocity,
             int ship_health,
+            float shootSoundVolume,
 
             float ship_rate_of_fire,
-            float bullet_velocity,
-            float bullet_size,
-            int   bullet_damage){
+            float bulletVelocity,
+            float bulletSize,
+            int bulletDamage){
 
         super(textureRegions);
         this.bulletTextureRegion = bulletTextureRegion;
         this.bulletSpritePool = bulletSpritePool;
         this.shootSound = shootSound;
+        this.shootSoundVolume = shootSoundVolume;
 
         this.ship_size = ship_size;
         this.ship_max_velocity = ship_max_velocity;
         this.ship_health = ship_health;
 
         this.ship_rate_of_fire = ship_rate_of_fire;
-        this.bullet_velocity = bullet_velocity;
-        this.bullet_size = bullet_size;
-        this.bullet_damage = bullet_damage;
+        this.bulletVelocity = bulletVelocity;
+        this.bulletSize = bulletSize;
+        this.bulletDamage = bulletDamage;
 
         setHeightProportion(ship_size);
     }
@@ -82,6 +84,7 @@ public abstract class BaseShip extends BaseSprite {
             float ship_size,
             float ship_max_velocity,
             int ship_health,
+            float shootSoundVolume,
 
             float ship_rate_of_fire,
             float bullet_velocity,
@@ -92,15 +95,16 @@ public abstract class BaseShip extends BaseSprite {
         this.bulletTextureRegion = bulletTextureRegion;
         this.bulletSpritePool = bulletSpritePool;
         this.shootSound = shootSound;
+        this.shootSoundVolume = shootSoundVolume;
 
         this.ship_size = ship_size;
         this.ship_max_velocity = ship_max_velocity;
         this.ship_health = ship_health;
 
         this.ship_rate_of_fire = ship_rate_of_fire;
-        this.bullet_velocity = bullet_velocity;
-        this.bullet_size = bullet_size;
-        this.bullet_damage = bullet_damage;
+        this.bulletVelocity = bullet_velocity;
+        this.bulletSize = bullet_size;
+        this.bulletDamage = bullet_damage;
 
         this.currentFrame = 0;
         this.initialized = true;
@@ -114,12 +118,12 @@ public abstract class BaseShip extends BaseSprite {
         super.recalc(deltaTime);
 
         //Делаем проверку на возможность выстрела и непосредственно выстрел
-        if (fire_delay_timer >= 1f/ship_rate_of_fire){
-            fire_delay_timer = 0f;
+        if (fireDelayTimer >= 1f/ship_rate_of_fire){
+            fireDelayTimer = 0f;
             temporary.set(0, 1);
             make_shoot(temporary.angle(velocity_vector));
         }
-        fire_delay_timer += deltaTime;
+        fireDelayTimer += deltaTime;
     }
 
     /**
@@ -133,14 +137,14 @@ public abstract class BaseShip extends BaseSprite {
         //Начальная позиция пули
         temporary.set(getCenterPosition()).add(0f, getHalfHeight()).rotateAround(getCenterPosition(), bulletAngle);
         //Скорость и направление пули
-        temporary2.set(0f, bullet_velocity).setAngle(bulletAngle + 90f);
+        temporary2.set(0f, bulletVelocity).setAngle(bulletAngle + 90f);
 
         bullet.set(bulletTextureRegion,
                 0,
                 temporary,
-                bullet_size,
+                bulletSize,
                 temporary2,
-                bullet_damage);
+                bulletDamage);
 
         bullet.setActive(true);
         //Положили в активные, оттуда она исчезнет по своему внутреннему условию
@@ -148,7 +152,7 @@ public abstract class BaseShip extends BaseSprite {
 
         //Звук выстрела
         long soundId = shootSound.play();
-        shootSound.setVolume(soundId, 0.04f);
+        shootSound.setVolume(soundId, shootSoundVolume);
     }
 
 

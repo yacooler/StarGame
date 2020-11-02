@@ -22,9 +22,9 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
     private static final float SHIP_SIZE = 0.15f;
     private static final float MAX_SHIP_VELOCITY = 0.5f;
     private static final int SHIP_HEALTH = 100;
-
+    private static final float SHOOT_SOUND_VOLUME = 0.3f;
     //Выстрелы
-    private static final float SHIP_RATE_OF_FIRE = 3f;
+    private static final float SHIP_RATE_OF_FIRE = 10f;
     private static final float BULLET_VELOCITY = -0.1f;
     private static final float BULLET_SIZE = 0.01f;
     private static final int   BULLET_DAMAGE = 1;
@@ -43,6 +43,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
                 SHIP_SIZE,
                 MAX_SHIP_VELOCITY,
                 SHIP_HEALTH,
+                SHOOT_SOUND_VOLUME,
                 SHIP_RATE_OF_FIRE,
 
                 BULLET_VELOCITY,

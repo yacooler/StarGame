@@ -38,6 +38,7 @@ public class EnemySpaceShip extends BaseShip {
                 shipDAO.ship_size,
                 shipDAO.ship_max_velocity,
                 shipDAO.ship_health,
+                shipDAO.shootSoundVolume,
                 shipDAO.ship_rate_of_fire,
                 shipDAO.bullet_velocity,
                 shipDAO.bullet_size,
@@ -86,7 +87,7 @@ public class EnemySpaceShip extends BaseShip {
         если до этого корабль не стрелял по таймеру. Таймер при этом выстреле сбросится в ноль.
          */
         if (!firstShoot && (1 - firstShootPosition) >= shipFrameAtTheScreenProportion && shoots == 0){
-            fire_delay_timer = Float.MAX_VALUE;
+            fireDelayTimer = Float.MAX_VALUE;
             firstShoot = true;
         }
 
