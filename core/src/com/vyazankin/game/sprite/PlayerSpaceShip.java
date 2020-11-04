@@ -1,22 +1,15 @@
 package com.vyazankin.game.sprite;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.vyazankin.game.base.BaseSprite;
+import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.base.InputListener;
 import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.utils.TextureUtils;
 
-public class PlayerSpaceShip extends BaseSprite implements InputListener {
-
-    private Rect worldBounds;
-    private final float SHIP_SIZE = 0.1f;
-    private Vector2 velocity;
-    private Vector2 temporary;
-    private final float SHIP_VELOCITY = 0.5f;
+public class PlayerSpaceShip extends BaseShip implements InputListener {
 
     private boolean isLeftPressed;
     private boolean isRightPressed;
@@ -25,74 +18,71 @@ public class PlayerSpaceShip extends BaseSprite implements InputListener {
     private int isLeftTouched = UNKNOWN_POINTER;
     private int isRightTouched = UNKNOWN_POINTER;
 
-    //Выстрелов в секунду
-    private final float RATE_OF_FIRE = 30f;
-    private final float BULLET_VELOCITY = -1f;
-    private final float BULLET_SIZE = 0.01f;
-    private final int   BULLET_DAMAGE = 1;
-    private float fire_delay_time;
+    //Корабль
+    private static final float SHIP_SIZE = 0.15f;
+    private static final float MAX_SHIP_VELOCITY = 0.5f;
+    private static final int SHIP_HEALTH = 100;
+    private static final float SHOOT_SOUND_VOLUME = 0.3f;
+    //Выстрелы
+    private static final float SHIP_RATE_OF_FIRE = 10f;
+    private static final float BULLET_VELOCITY = -0.1f;
+    private static final float BULLET_SIZE = 0.01f;
+    private static final int   BULLET_DAMAGE = 1;
 
-    private BulletSpritePool bulletSpritePool;
-
-    private TextureAtlas mainAtlas;
 
     Sound shootSound;
 
 
-    public PlayerSpaceShip(TextureRegion region, BulletSpritePool bulletSpritePool) {
-        super(region);
-        temporary = new Vector2(0,1);
-        velocity = new Vector2(0,0);
+    public PlayerSpaceShip(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, Sound shootSound) {
+
+        super(  TextureUtils.split(mainAtlas.findRegion("main_ship"),1,2,2),
+                mainAtlas.findRegion("bulletMainShip"),
+                bulletSpritePool,
+                shootSound,
+
+                SHIP_SIZE,
+                MAX_SHIP_VELOCITY,
+                SHIP_HEALTH,
+                SHOOT_SOUND_VOLUME,
+                SHIP_RATE_OF_FIRE,
+
+                BULLET_VELOCITY,
+                BULLET_SIZE,
+                BULLET_DAMAGE);
+
         this.bulletSpritePool = bulletSpritePool;
-
-        mainAtlas = new TextureAtlas("resources/textures/mainAtlas.tpack");
-
-        //Для звуков выстрела
-        shootSound =  Gdx.audio.newSound(Gdx.files.internal("resources/sounds/bullet.wav"));
-
-
+        this.shootSound = shootSound;
     }
-
-
 
     @Override
     public void worldResize(Rect bounds) {
         super.worldResize(bounds);
-        worldBounds = bounds;
-        setHeightProportion(SHIP_SIZE);
-        setBottom(bounds.getBottom() + SHIP_SIZE / 3);
+        setBottom(bounds.getBottom() + SHIP_SIZE / 4);
     }
 
     @Override
     public void recalc(float deltaTime) {
         super.recalc(deltaTime);
-        centerPosition.mulAdd(velocity, deltaTime);
-        if (getLeft() < getActualWorldBound().getLeft()){
-            setLeft(getActualWorldBound().getLeft());
+
+        centerPosition.mulAdd(velocity_vector, deltaTime);
+        if (getLeft() < getActualSpriteWorldBound().getLeft()){
+            setLeft(getActualSpriteWorldBound().getLeft());
             stop();
-        } else if(getRight() > getActualWorldBound().getRight()){
-            setRight(getActualWorldBound().getRight());
+        } else if(getRight() > getActualSpriteWorldBound().getRight()){
+            setRight(getActualSpriteWorldBound().getRight());
             stop();
         }
 
         temporary.set(0f, 1f);
-        float shipAngle = temporary.angle(velocity) /3f;
-
+        float shipAngle = temporary.angle(velocity_vector) /3f;
         setAngle(shipAngle);
-
-        //Делаем проверку на выстрел и выстрел
-        fire_delay_time += deltaTime;
-        if (1f/RATE_OF_FIRE < fire_delay_time){
-            fire_delay_time = 0f;
-            fire(shipAngle);
-        }
 
 
     }
 
     @Override
     public void touchDown(Vector2 worldTouchPosition, int pointer, int button) {
-        if (worldTouchPosition.x < getActualWorldBound().getCenterPosition().x){
+        if (worldTouchPosition.x < getActualSpriteWorldBound().getCenterPosition().x){
             isLeftTouched = pointer;
             moveLeft();
         } else {
@@ -141,7 +131,6 @@ public class PlayerSpaceShip extends BaseSprite implements InputListener {
     @Override
     public boolean keyUp(int keycode) {
         switch (keycode){
-
             case Input.Keys.A:
             case Input.Keys.LEFT:
                 isLeftPressed = false;
@@ -166,44 +155,18 @@ public class PlayerSpaceShip extends BaseSprite implements InputListener {
     }
 
     public void moveLeft(){
-        velocity.x = -SHIP_VELOCITY;
+        velocity_vector.x = -MAX_SHIP_VELOCITY;
     }
 
     public void moveRight(){
-        velocity.x = SHIP_VELOCITY;
+        velocity_vector.x = MAX_SHIP_VELOCITY;
     }
 
     public void stop(){
-        velocity.setZero();
+        velocity_vector.setZero();
     }
 
-    public void fire(float buletAngle) {
-        //Взяли спрайт в неактивных или новых
-        Bullet bullet = bulletSpritePool.poolNewOrInactiveSprite();
 
-        //Начальная позиция пули
-
-        temporary.set(getCenterPosition()).add(0f, getHalfHeight()).rotateAround(getCenterPosition(), buletAngle);
-        bullet.set(
-                mainAtlas.findRegion("bulletMainShip"),
-                0,
-                temporary,
-                BULLET_SIZE);
-        bullet.setDamage(BULLET_DAMAGE);
-
-        //Скорость и направление пули
-        temporary.set(0f, BULLET_VELOCITY).setAngle(buletAngle + 90f);
-
-        bullet.setVelocity(temporary);
-        bullet.setActive(true);
-        //Положили в активные, оттуда она исчезнет по своему внутреннему условию
-        bulletSpritePool.addSpriteIntoActive(bullet);
-
-        //Звук выстрела
-        long soundId = shootSound.play();
-        shootSound.setVolume(soundId, 0.04f);
-
-    }
 
     @Override
     public void dispose() {

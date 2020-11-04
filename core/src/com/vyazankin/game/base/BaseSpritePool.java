@@ -51,7 +51,10 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      * Должен быть вызван из метода render baseScreen
      */
     public void recalc(float deltaTime){
+        if (actualWorldBound == null) return;
+
         for (T t : activeSprites){
+            t.actualSpriteWorldBound = actualWorldBound;
             if (t.isActive) t.recalc(deltaTime);
         }
         checkInactiveSprites();
@@ -96,10 +99,11 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      * Получение спрайта из пула
      */
     public T poolNewOrInactiveSprite(){
+
         T sprite;
         if (inactiveSprites.isEmpty()){
             sprite = obtainSprite();
-            sprite.worldResize(actualWorldBound);
+            sprite.actualSpriteWorldBound = actualWorldBound;
         } else {
             sprite = inactiveSprites.remove(inactiveSprites.size() - 1);
         }

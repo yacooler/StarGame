@@ -33,16 +33,16 @@ public class Star extends BaseSprite {
         super.recalc(deltaTime);
         setCenterPosition(getCenterPosition().mulAdd(velocity, deltaTime));
 
-        if (getRight() < getActualWorldBound().getLeft()){
-            setLeft(getActualWorldBound().getRight());
+        if (getRight() < getActualSpriteWorldBound().getLeft()){
+            setLeft(getActualSpriteWorldBound().getRight());
         }
 
-        if (getLeft() > getActualWorldBound().getRight()){
-            setRight(getActualWorldBound().getLeft());
+        if (getLeft() > getActualSpriteWorldBound().getRight()){
+            setRight(getActualSpriteWorldBound().getLeft());
         }
 
-        if (getTop() < getActualWorldBound().getBottom()){
-            setBottom(getActualWorldBound().getTop());
+        if (getTop() < getActualSpriteWorldBound().getBottom()){
+            setBottom(getActualSpriteWorldBound().getTop());
         }
     }
 }

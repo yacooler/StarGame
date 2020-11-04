@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * Класс, описывающий базовый экран игры
  */
-public class BaseScreen implements Screen, InputProcessor {
+public abstract class BaseScreen implements Screen, InputProcessor {
 
     protected SpriteBatch batch;
 
@@ -95,6 +95,10 @@ public class BaseScreen implements Screen, InputProcessor {
     /*------------------------------------------Секция работы с пулами -----------------------------*/
     public void addSpritePool(BaseSpritePool pool){
         baseSpritePoolList.add(pool);
+        if (worldBounds != null) {
+            pool.worldResize(worldBounds);
+            System.out.println("WB -> pool");
+        }
     }
 
 
@@ -133,6 +137,12 @@ public class BaseScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0.03f, 0.03f, 0.03f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        //Если вызвали раньше ресайза - выход
+        if (worldBounds == null) return;
+
+        //Запускаем событие рекалка для экранов - наследников
+        recalc(delta);
+
         //Пересчитываем пулы
         for (BaseSpritePool pool: baseSpritePoolList) {
             pool.recalc(delta);
@@ -147,6 +157,11 @@ public class BaseScreen implements Screen, InputProcessor {
 
     }
 
+    /**
+     * Может быть перегружено у наследников для создания дополнительной логики
+     * @param deltaTime
+     */
+    protected void recalc(float deltaTime){}
 
     @Override
     public void resize(int width, int height) {
