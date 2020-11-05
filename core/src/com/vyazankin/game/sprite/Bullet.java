@@ -10,6 +10,7 @@ public class Bullet extends BaseSprite {
 
 
     private Vector2 velocity = new Vector2();
+
     private int damage;
     private boolean playerIsOwner;
 
@@ -48,5 +49,9 @@ public class Bullet extends BaseSprite {
 
     public int getDamage(){
         return damage;
+    }
+
+    public Vector2 getVelocity(){
+        return velocity;
     }
 }

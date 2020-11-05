@@ -13,6 +13,7 @@ import com.vyazankin.game.base.BaseSprite;
 import com.vyazankin.game.math.Rect;
 import com.vyazankin.game.sprite.Background;
 import com.vyazankin.game.sprite.Bullet;
+import com.vyazankin.game.sprite.Explosion;
 import com.vyazankin.game.sprite.GameOver;
 import com.vyazankin.game.spritepools.BulletSpritePool;
 import com.vyazankin.game.spritepools.EnemyShipPooler;
@@ -57,9 +58,13 @@ public class GameScreen extends BaseScreen {
 
     private boolean started;
 
+    Rect hitBox;
+
     @Override
     public void show() {
         super.show();
+
+        hitBox = new Rect();
 
         shootSound =  Gdx.audio.newSound(Gdx.files.internal("resources/sounds/laser.wav"));
         enemyShootSound = Gdx.audio.newSound(Gdx.files.internal("resources/sounds/bullet.wav"));
@@ -113,7 +118,7 @@ public class GameScreen extends BaseScreen {
         gameOverMessage.setHeightProportion(0.1f);
 
 
-        //Новая игра
+        //Кнопка Новая игра
         newGame = new BaseButton(mainAtlas.findRegion("button_new_game")) {
             @Override
             public void action() {
@@ -130,9 +135,7 @@ public class GameScreen extends BaseScreen {
         };
         addInputListener(newGame);
 
-        gameOver();
-
-
+        started = true;
 
     }
 
@@ -203,9 +206,14 @@ public class GameScreen extends BaseScreen {
                     baseShip = spaceShip;
                 }
 
-                if (baseShip.isVectorInside(bullet.getCenterPosition())) {
+                //Получаем размер корабля и немного уменьшаем его для получения хитбокса
+                if (hitBox.clone(baseShip).scale(0.85f).isVectorInside(bullet.getCenterPosition())) {
                     baseShip.damage(bullet.getDamage());
                     bullet.setActive(false);
+                    Explosion explosion = explosionSpritePool.poolNewOrInactiveSprite();
+                    explosion.set(bullet.getCenterPosition(), bullet.getFullWidth() * 3f);
+                    explosion.setActive(true);
+                    explosionSpritePool.addSpriteIntoActive(explosion);
                     retValue = true;
                 }
 
@@ -234,10 +242,7 @@ public class GameScreen extends BaseScreen {
         spaceShip.setActive(true);
         addSpriteToDefaultPool(spaceShip, true);
         gameOverMessage.setActive(false);
-        //newGame.setActive(false);
+        newGame.setActive(false);
         started = true;
-
-
-
     }
 }

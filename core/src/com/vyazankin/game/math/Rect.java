@@ -34,6 +34,18 @@ public class Rect {
         this.halfWidth = halfWidth;
     }
 
+    public Rect clone(Rect sourceRect){
+        this.centerPosition.set(sourceRect.getCenterPosition());
+        this.halfHeight = sourceRect.halfHeight;
+        this.halfWidth = sourceRect.halfWidth;
+        return this;
+    }
+
+    public Rect scale(float scale){
+        halfHeight *= scale;
+        halfWidth *= scale;
+        return this;
+    }
 
     //Геттеры/Сеттеры
     public Vector2 getCenterPosition() {

@@ -20,7 +20,7 @@ public class Explosion extends BaseSprite {
         setCenterPosition(centerPosition);
         currentFrame = 0;
         setHeightProportion(heightProportion);
-        explosionSound.play(0.5f);
+        explosionSound.play(heightProportion > 0.33f ? 0.33f :heightProportion * 3f);
     }
 
     @Override
