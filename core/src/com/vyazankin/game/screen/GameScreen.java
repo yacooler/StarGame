@@ -104,7 +104,7 @@ public class GameScreen extends BaseScreen {
         //Корабль игрока, находится в пуле по умолчанию
         spaceShip = new PlayerSpaceShip(mainAtlas, bulletSpritePool, explosionSpritePool, shootSound);
 
-        //addSpriteToDefaultPool(spaceShip, true);
+        addSpriteToDefaultPool(spaceShip, true);
 
         addInputListener(spaceShip);
 
@@ -130,7 +130,7 @@ public class GameScreen extends BaseScreen {
         };
         addInputListener(newGame);
 
-        gameOver();
+        //gameOver();
 
 
 

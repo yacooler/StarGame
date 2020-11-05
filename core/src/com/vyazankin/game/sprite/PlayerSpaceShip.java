@@ -72,6 +72,8 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
                 BULLET_VELOCITY,
                 BULLET_SIZE,
                 BULLET_DAMAGE);
+
+        velocity_vector.set(0,0);
     }
 
 
