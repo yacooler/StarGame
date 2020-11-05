@@ -103,8 +103,7 @@ public class GameScreen extends BaseScreen {
 
         //Спрайт окончания игры
         gameOver = new GameOver(mainAtlas.findRegion("message_game_over"));
-        addSpriteToDefaultPool(gameOver);
-
+        gameOver.setHeightProportion(0.1f);
 
     }
 
@@ -183,8 +182,7 @@ public class GameScreen extends BaseScreen {
         if (!spaceShip.isActive()){
             bulletSpritePool.forceInactive();
             enemyShipPooler.forceInactive();
-            gameOver.setActive(true);
-            addSpriteIntoActiveToDefaultPool(gameOver);
+            addSpriteToDefaultPool(gameOver, true);
         }
 
 
