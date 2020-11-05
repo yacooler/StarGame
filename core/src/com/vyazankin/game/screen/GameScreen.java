@@ -6,9 +6,11 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.vyazankin.game.base.BaseButton;
 import com.vyazankin.game.base.BaseScreen;
 import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.base.BaseSprite;
+import com.vyazankin.game.math.Rect;
 import com.vyazankin.game.sprite.Background;
 import com.vyazankin.game.sprite.Bullet;
 import com.vyazankin.game.sprite.GameOver;
@@ -34,7 +36,7 @@ public class GameScreen extends BaseScreen {
     private final int STARS_COUNT = 64;
 
     private PlayerSpaceShip spaceShip;
-    private GameOver gameOver;
+    private GameOver gameOverMessage;
 
     private BulletSpritePool bulletSpritePool;
     private ExplosionSpritePool explosionSpritePool;
@@ -45,11 +47,15 @@ public class GameScreen extends BaseScreen {
 
     private EnemyShipPooler enemyShipPooler;
 
+    private BaseButton newGame;
+
     private int MAX_SHIPS = 15;
 
     Sound shootSound;
     Sound enemyShootSound;
     Sound explosionSound;
+
+    private boolean started;
 
     @Override
     public void show() {
@@ -75,7 +81,7 @@ public class GameScreen extends BaseScreen {
         addSpriteToDefaultPool(background, true);
 
         //Взрывы
-        ExplosionSpritePool explosionSpritePool = new ExplosionSpritePool(mainAtlas, explosionSound);
+        explosionSpritePool = new ExplosionSpritePool(mainAtlas, explosionSound);
 
         //Пуллер кораблей - класс, отвечающий за создание вражеских кораблей. Наследуется от BaseSpritePool
         enemyShipPooler = new EnemyShipPooler(mainAtlas, bulletSpritePool, explosionSpritePool, enemyShootSound);
@@ -98,19 +104,47 @@ public class GameScreen extends BaseScreen {
         //Корабль игрока, находится в пуле по умолчанию
         spaceShip = new PlayerSpaceShip(mainAtlas, bulletSpritePool, explosionSpritePool, shootSound);
 
-        addSpriteToDefaultPool(spaceShip, true);
+        //addSpriteToDefaultPool(spaceShip, true);
+
         addInputListener(spaceShip);
 
         //Спрайт окончания игры
-        gameOver = new GameOver(mainAtlas.findRegion("message_game_over"));
-        gameOver.setHeightProportion(0.1f);
+        gameOverMessage = new GameOver(mainAtlas.findRegion("message_game_over"));
+        gameOverMessage.setHeightProportion(0.1f);
+
+
+        //Новая игра
+        newGame = new BaseButton(mainAtlas.findRegion("button_new_game")) {
+            @Override
+            public void action() {
+                System.out.println("action");
+                startNewGame();
+            }
+
+            @Override
+            protected void worldResize(Rect bounds) {
+                super.worldResize(bounds);
+                newGame.setHeightProportion(0.1f);
+                newGame.setBottom(worldBounds.getBottom() + newGame.getFullHeight() *2f );
+            }
+        };
+        addInputListener(newGame);
+
+        gameOver();
+
+
 
     }
 
 
+
     @Override
     protected void recalc(float deltaTime) {
+
         super.recalc(deltaTime);
+
+        if (!started) return;
+
         int ships;
 
         ships = enemyShipPooler.getActiveSpritesList().size();
@@ -180,12 +214,27 @@ public class GameScreen extends BaseScreen {
 
         //Если игрок проиграл
         if (!spaceShip.isActive()){
-            bulletSpritePool.forceInactive();
-            enemyShipPooler.forceInactive();
-            addSpriteToDefaultPool(gameOver, true);
+            gameOver();
         }
 
-
         return retValue;
+    }
+
+    private void gameOver(){
+        started = false;
+        bulletSpritePool.forceInactive();
+        enemyShipPooler.forceInactive();
+        addSpriteToDefaultPool(gameOverMessage, true);
+        addSpriteToDefaultPool(newGame, true);
+        spaceShip.setActive(false);
+    }
+
+    private void startNewGame(){
+        spaceShip.reset();
+        spaceShip.setActive(true);
+        addSpriteToDefaultPool(spaceShip, true);
+        gameOverMessage.setActive(false);
+        newGame.setActive(false);
+        started = true;
     }
 }

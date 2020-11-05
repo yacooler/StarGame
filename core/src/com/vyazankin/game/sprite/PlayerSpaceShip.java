@@ -57,6 +57,24 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
         this.playerShip = true;
     }
 
+    public void reset(){
+        set(textureRegions,
+                bulletTextureRegion,
+                bulletSpritePool,
+                shootSound,
+                SHIP_SIZE,
+
+                MAX_SHIP_VELOCITY,
+                SHIP_HEALTH,
+                SHOOT_SOUND_VOLUME,
+                SHIP_RATE_OF_FIRE,
+
+                BULLET_VELOCITY,
+                BULLET_SIZE,
+                BULLET_DAMAGE);
+    }
+
+
     @Override
     public void worldResize(Rect bounds) {
         super.worldResize(bounds);

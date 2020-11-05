@@ -19,6 +19,7 @@ public class EnemyShipPooler extends BaseSpritePool<EnemySpaceShip> {
     EnemyShipParamGetter enemyShipParamGetter;
 
 
+
     public EnemyShipPooler(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, ExplosionSpritePool explosionSpritePool, Sound shootSound) {
         this.mainAtlas = mainAtlas;
         this.bulletSpritePool = bulletSpritePool;
@@ -27,6 +28,8 @@ public class EnemyShipPooler extends BaseSpritePool<EnemySpaceShip> {
 
         enemyShipParamGetter = new EnemyShipParamGetter();
     }
+
+
 
     @Override
     protected EnemySpaceShip obtainSprite() {
