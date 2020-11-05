@@ -1,6 +1,7 @@
-package com.vyazankin.game.sprite;
+package com.vyazankin.game.spritepools;
 
 import com.vyazankin.game.base.BaseSpritePool;
+import com.vyazankin.game.sprite.Bullet;
 
 public class BulletSpritePool extends BaseSpritePool<Bullet> {
     @Override

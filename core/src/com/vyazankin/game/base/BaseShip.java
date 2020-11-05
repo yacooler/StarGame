@@ -4,16 +4,18 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.sprite.Bullet;
-import com.vyazankin.game.sprite.BulletSpritePool;
+import com.vyazankin.game.spritepools.BulletSpritePool;
+import com.vyazankin.game.sprite.Explosion;
+import com.vyazankin.game.spritepools.ExplosionSpritePool;
 
 public abstract class BaseShip extends BaseSprite {
 
 
     //Параметры корабля
-    private float ship_size;
-    private float ship_max_velocity;
-    private int ship_health;
-    private float ship_rate_of_fire;
+    private float shipSize;
+    private float shipMaxVelocity;
+    private int shipHealth;
+    private float shipRateOfFire;
 
 
     //Параметры стрельбы
@@ -22,10 +24,12 @@ public abstract class BaseShip extends BaseSprite {
     private float bulletSize;
     private int bulletDamage;
     protected float fireDelayTimer;
+    protected float damageTimer = 10f;
     private float shootSoundVolume;
 
     //Общие пулы и ресурсы (не удаляем вместе с кораблем)
     protected BulletSpritePool bulletSpritePool;
+    protected ExplosionSpritePool explosionSpritePool;
     protected Sound shootSound;
     protected TextureRegion bulletTextureRegion;
 
@@ -36,43 +40,49 @@ public abstract class BaseShip extends BaseSprite {
     protected Vector2 temporary = new Vector2();
     protected Vector2 temporary2 = new Vector2();
 
+
     protected int shoots;
 
-    public BaseShip(){
+    protected boolean playerShip = false;
+
+    public BaseShip(boolean playerShip){
+        this.playerShip = playerShip;
     }
 
     public BaseShip(
             TextureRegion[] textureRegions,
             TextureRegion bulletTextureRegion,
             BulletSpritePool bulletSpritePool,
+            ExplosionSpritePool explosionSpritePool,
             Sound shootSound,
 
-            float ship_size,
-            float ship_max_velocity,
-            int ship_health,
+            float shipSize,
+            float shipMaxVelocity,
+            int shipHealth,
             float shootSoundVolume,
 
-            float ship_rate_of_fire,
+            float shipRateOfFire,
             float bulletVelocity,
             float bulletSize,
             int bulletDamage){
 
         super(textureRegions);
         this.bulletTextureRegion = bulletTextureRegion;
+        this.explosionSpritePool = explosionSpritePool;
         this.bulletSpritePool = bulletSpritePool;
         this.shootSound = shootSound;
         this.shootSoundVolume = shootSoundVolume;
 
-        this.ship_size = ship_size;
-        this.ship_max_velocity = ship_max_velocity;
-        this.ship_health = ship_health;
+        this.shipSize = shipSize;
+        this.shipMaxVelocity = shipMaxVelocity;
+        this.shipHealth = shipHealth;
 
-        this.ship_rate_of_fire = ship_rate_of_fire;
+        this.shipRateOfFire = shipRateOfFire;
         this.bulletVelocity = bulletVelocity;
         this.bulletSize = bulletSize;
         this.bulletDamage = bulletDamage;
 
-        setHeightProportion(ship_size);
+        setHeightProportion(shipSize);
     }
 
     public void set(
@@ -81,15 +91,15 @@ public abstract class BaseShip extends BaseSprite {
             BulletSpritePool bulletSpritePool,
             Sound shootSound,
 
-            float ship_size,
-            float ship_max_velocity,
-            int ship_health,
+            float shipSize,
+            float shipMaxVelocity,
+            int shipHealth,
             float shootSoundVolume,
 
-            float ship_rate_of_fire,
-            float bullet_velocity,
-            float bullet_size,
-            int   bullet_damage) {
+            float shipRateOfFire,
+            float bulletVelocity,
+            float bulletSize,
+            int   bulletDamage) {
 
         this.textureRegions = textureRegions;
         this.bulletTextureRegion = bulletTextureRegion;
@@ -97,19 +107,23 @@ public abstract class BaseShip extends BaseSprite {
         this.shootSound = shootSound;
         this.shootSoundVolume = shootSoundVolume;
 
-        this.ship_size = ship_size;
-        this.ship_max_velocity = ship_max_velocity;
-        this.ship_health = ship_health;
+        this.shipSize = shipSize;
+        this.shipMaxVelocity = shipMaxVelocity;
+        this.shipHealth = shipHealth;
 
-        this.ship_rate_of_fire = ship_rate_of_fire;
-        this.bulletVelocity = bullet_velocity;
-        this.bulletSize = bullet_size;
-        this.bulletDamage = bullet_damage;
+        this.shipRateOfFire = shipRateOfFire;
+        this.bulletVelocity = bulletVelocity;
+        this.bulletSize = bulletSize;
+        this.bulletDamage = bulletDamage;
 
         this.currentFrame = 0;
         this.initialized = true;
+        shoots = 0;
 
-        setHeightProportion(ship_size);
+        this.fireDelayTimer = 0;
+        this.damageTimer = 10f;
+
+        setHeightProportion(shipSize);
 
     }
 
@@ -117,19 +131,29 @@ public abstract class BaseShip extends BaseSprite {
     public void recalc(float deltaTime) {
         super.recalc(deltaTime);
 
+        fireDelayTimer += deltaTime;
         //Делаем проверку на возможность выстрела и непосредственно выстрел
-        if (fireDelayTimer >= 1f/ship_rate_of_fire){
+        if (fireDelayTimer >= 1f/ shipRateOfFire){
             fireDelayTimer = 0f;
             temporary.set(0, 1);
-            make_shoot(temporary.angle(velocity_vector));
+            makeShoot(temporary.angle(velocity_vector));
         }
-        fireDelayTimer += deltaTime;
+
+        damageTimer += deltaTime;
+        //проверка на урон
+        if (damageTimer > 0.1f){
+            currentFrame = 0;
+            damageTimer = 10f;
+        } else {
+            currentFrame = 1;
+        }
+
     }
 
     /**
      * Сделать выстрел
      */
-    protected void make_shoot(float bulletAngle){
+    protected void makeShoot(float bulletAngle){
         shoots++;
         //Взяли пулю в неактивных или новых
         Bullet bullet = bulletSpritePool.poolNewOrInactiveSprite();
@@ -144,7 +168,9 @@ public abstract class BaseShip extends BaseSprite {
                 temporary,
                 bulletSize,
                 temporary2,
-                bulletDamage);
+                bulletDamage,
+
+                playerShip);
 
         bullet.setActive(true);
         //Положили в активные, оттуда она исчезнет по своему внутреннему условию
@@ -153,6 +179,31 @@ public abstract class BaseShip extends BaseSprite {
         //Звук выстрела
         long soundId = shootSound.play();
         shootSound.setVolume(soundId, shootSoundVolume);
+    }
+
+
+    /**
+     * Получение урона damage кораблем. В случае, когда здоровье меньше либо равно 0 - вызывает destroy()
+     * @param damage
+     */
+    public void damage(int damage){
+        damageTimer = 0f;
+        shipHealth -= damage;
+        if (shipHealth <= 0){
+            destroy();
+        }
+    }
+
+    public void destroy(){
+        Explosion explosion = explosionSpritePool.poolNewOrInactiveSprite();
+        explosion.set(getCenterPosition(), shipSize);
+        explosion.setActive(true);
+        explosionSpritePool.addSpriteIntoActive(explosion);
+        setActive(false);
+    }
+
+    public int getShipHealth(){
+        return shipHealth;
     }
 
 

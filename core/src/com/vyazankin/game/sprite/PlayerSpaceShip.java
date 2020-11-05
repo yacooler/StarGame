@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.base.InputListener;
 import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.spritepools.BulletSpritePool;
+import com.vyazankin.game.spritepools.ExplosionSpritePool;
 import com.vyazankin.game.utils.TextureUtils;
 
 public class PlayerSpaceShip extends BaseShip implements InputListener {
@@ -25,7 +27,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
     private static final float SHOOT_SOUND_VOLUME = 0.3f;
     //Выстрелы
     private static final float SHIP_RATE_OF_FIRE = 10f;
-    private static final float BULLET_VELOCITY = -0.1f;
+    private static final float BULLET_VELOCITY = -1f;
     private static final float BULLET_SIZE = 0.01f;
     private static final int   BULLET_DAMAGE = 1;
 
@@ -33,11 +35,11 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
     Sound shootSound;
 
 
-    public PlayerSpaceShip(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, Sound shootSound) {
-
+    public PlayerSpaceShip(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, ExplosionSpritePool explosionSpritePool, Sound shootSound) {
         super(  TextureUtils.split(mainAtlas.findRegion("main_ship"),1,2,2),
                 mainAtlas.findRegion("bulletMainShip"),
                 bulletSpritePool,
+                explosionSpritePool,
                 shootSound,
 
                 SHIP_SIZE,
@@ -52,6 +54,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
 
         this.bulletSpritePool = bulletSpritePool;
         this.shootSound = shootSound;
+        this.playerShip = true;
     }
 
     @Override

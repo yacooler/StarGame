@@ -82,6 +82,10 @@ public abstract class BaseScreen implements Screen, InputProcessor {
         sprite.setActive(active);
     }
 
+    public void addSpriteIntoActiveToDefaultPool(BaseSprite sprite){
+        defaultSpritePool.addSpriteIntoActive(sprite);
+    }
+
     /**
      * Исключение спрайта из пула по умолчанию (включая исключение из листнеров!)
      */
@@ -161,7 +165,9 @@ public abstract class BaseScreen implements Screen, InputProcessor {
      * Может быть перегружено у наследников для создания дополнительной логики
      * @param deltaTime
      */
-    protected void recalc(float deltaTime){}
+    protected void recalc(float deltaTime){
+        checks();
+    }
 
     @Override
     public void resize(int width, int height) {
@@ -184,6 +190,7 @@ public abstract class BaseScreen implements Screen, InputProcessor {
             pool.worldResize(worldBounds);
         }
         //defaultSpritePool.worldResize(worldBounds);
+
     }
 
     /**
@@ -334,6 +341,12 @@ public abstract class BaseScreen implements Screen, InputProcessor {
      * Событие ресайз в мировой(игровой) системе координат
      */
     protected void worldResize(Rect bounds){}
+
+
+    /**
+     * Проверка столкновений
+     */
+    protected boolean checks(){return false;};
 
 
 

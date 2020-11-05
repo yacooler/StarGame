@@ -6,6 +6,8 @@ import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.dao.EnemyShipDAO;
 import com.vyazankin.game.math.RandomBounds;
 import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.spritepools.BulletSpritePool;
+import com.vyazankin.game.spritepools.ExplosionSpritePool;
 import com.vyazankin.game.utils.TextureUtils;
 
 public class EnemySpaceShip extends BaseShip {
@@ -20,10 +22,11 @@ public class EnemySpaceShip extends BaseShip {
     private float firstShootPosition = 1f;
 
 
-    public EnemySpaceShip(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, Sound shootSound) {
-        super();
+    public EnemySpaceShip(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, ExplosionSpritePool explosionSpritePool, Sound shootSound) {
+        super(false);
         this.mainAtlas = mainAtlas;
         this.bulletSpritePool = bulletSpritePool;
+        this.explosionSpritePool = explosionSpritePool;
         this.shootSound = shootSound;
         initialized = false;
 
@@ -69,7 +72,7 @@ public class EnemySpaceShip extends BaseShip {
         if (shipFrameAtTheScreenProportion > 1f) shipFrameAtTheScreenProportion = 1f;
 
         /*Скорость корабля скалирована от его позиции на экране. Если корабль на экране не показан - его скорость увеличена,
-        конда корабль на экране полностью - его скорость стандартна
+        когда корабль на экране полностью - его скорость стандартна
         */
         if (getTop() >= actualSpriteWorldBound.getTop()) {
             temporary.set(velocity_vector).scl(1f + velocityScaler * shipFrameAtTheScreenProportion);

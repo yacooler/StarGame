@@ -141,6 +141,13 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
         inactiveSprites = null;
     }
 
+    //Принудительно переводит все активные спрайты в инактив
+    public void forceInactive(){
+        for (BaseSprite sprite : getActiveSpritesList()){
+            sprite.setActive(false);
+        }
+        checkInactiveSprites();
+    }
 
 
 }
