@@ -4,24 +4,30 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.vyazankin.game.math.Rect;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class BaseSpritePool<T extends BaseSprite> {
 
-    protected List<T> activeSprites;
-    protected List<T> inactiveSprites;
+    //HashSet гарантирует, что мы не добавим спрайт в одно множество несколько раз
+    protected HashSet<T> activeSprites;
+    protected HashSet<T> inactiveSprites;
 
 
     public BaseSpritePool() {
-        activeSprites = new ArrayList<>();
-        inactiveSprites = new ArrayList<>();
+        //Linked т.к. важна очередность спрайтов
+        activeSprites = new LinkedHashSet<>();
+        inactiveSprites = new LinkedHashSet<>();
     }
 
-    public List<T> getActiveSpritesList(){
+    public HashSet<T> getActiveSpritesList(){
         return activeSprites;
     }
 
-    public List<T> getInactiveSpritesList(){
+    public HashSet<T> getInactiveSpritesList(){
         return inactiveSprites;
     }
 
@@ -36,6 +42,7 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      * Функция добавления спрайта в пул
      */
     public void addSpriteIntoActive(T sprite){
+        //Удалим из неактивных, если он там был
         removeSprite(sprite);
         activeSprites.add(sprite);
     }
@@ -44,7 +51,7 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      * Функция исключения спрайта из пула
      */
     public void removeSprite(T sprite){
-        if (!activeSprites.remove(sprite)) inactiveSprites.remove(sprite);
+        if (!inactiveSprites.remove(sprite)) activeSprites.remove(sprite);
     }
 
     /**
@@ -100,12 +107,18 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      */
     public T poolNewOrInactiveSprite(){
 
-        T sprite;
+        T sprite = null;
+
         if (inactiveSprites.isEmpty()){
             sprite = obtainSprite();
             sprite.actualSpriteWorldBound = actualWorldBound;
         } else {
-            sprite = inactiveSprites.remove(inactiveSprites.size() - 1);
+            Iterator<T> iterator = inactiveSprites.iterator();
+            if (iterator.hasNext()) {
+                sprite = iterator.next();
+                iterator.remove();
+            }
+
         }
         return sprite;
     }
@@ -115,13 +128,16 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      */
     public void checkInactiveSprites(){
         if (activeSprites.isEmpty()) return;
-        for(int i = 0; i < activeSprites.size(); i++){
-            if (!activeSprites.get(i).isActive){
-                inactiveSprites.add(activeSprites.get(i));
-                activeSprites.remove(i);
-                i--;
-            }
+        T sprite;
+        Iterator<T> iterator = activeSprites.iterator();
+        while (iterator.hasNext()){
+            sprite = iterator.next();
+            if (!sprite.isActive()){
+              inactiveSprites.add(sprite);
+              iterator.remove();
+            };
         }
+
     }
 
     public void dispose(){
