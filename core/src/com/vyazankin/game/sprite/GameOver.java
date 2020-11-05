@@ -13,6 +13,6 @@ public class GameOver extends BaseSprite {
     protected void recalc(float deltaTime) {
         super.recalc(deltaTime);
         recalcTimer += deltaTime;
-        setCenterPosition(0, (float) Math.sin(recalcTimer / 10f) / 3f);
+        setCenterPosition(0, (float) Math.sin(recalcTimer / 1000f) / 3f);
     }
 }
