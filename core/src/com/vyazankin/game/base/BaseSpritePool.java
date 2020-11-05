@@ -36,7 +36,7 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
      * Функция добавления спрайта в пул
      */
     public void addSpriteIntoActive(T sprite){
-        //sprite.worldResize(actualWorldBound);
+        removeSprite(sprite);
         activeSprites.add(sprite);
     }
 

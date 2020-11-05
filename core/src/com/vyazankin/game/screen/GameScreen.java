@@ -130,7 +130,7 @@ public class GameScreen extends BaseScreen {
         };
         addInputListener(newGame);
 
-        //gameOver();
+        gameOver();
 
 
 
@@ -234,7 +234,10 @@ public class GameScreen extends BaseScreen {
         spaceShip.setActive(true);
         addSpriteToDefaultPool(spaceShip, true);
         gameOverMessage.setActive(false);
-        newGame.setActive(false);
+        //newGame.setActive(false);
         started = true;
+
+
+
     }
 }
