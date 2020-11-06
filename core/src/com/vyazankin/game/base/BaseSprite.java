@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.math.Rect;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 
 abstract public class BaseSprite extends Rect {
 
@@ -135,8 +138,5 @@ abstract public class BaseSprite extends Rect {
     protected void recalc(float deltaTime){
         if (!initialized) throw new IllegalArgumentException("Перед использованием спрайта он должен быть инициализирован! " + this);
     };
-
-
-
 
 }

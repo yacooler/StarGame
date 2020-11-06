@@ -46,7 +46,7 @@ public abstract class BaseButton extends BaseSprite implements InputListener {
         }
 
         //action() вызывается последним, т.к. после него экрана и текстур уже может не существовать
-        if (this.pointer == pointer && isTouchDownInBounds(worldTouchPosition)){
+        if (isActive() && this.pointer == pointer && isTouchDownInBounds(worldTouchPosition)){
             action();
         }
     }

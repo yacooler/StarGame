@@ -10,7 +10,9 @@ public class Bullet extends BaseSprite {
 
 
     private Vector2 velocity = new Vector2();
+
     private int damage;
+    private boolean playerIsOwner;
 
 
     public void set(TextureRegion region,
@@ -19,13 +21,16 @@ public class Bullet extends BaseSprite {
                     float highProportion,
 
                     Vector2 velocity,
-                    int damage) {
+                    int damage,
+
+                    boolean playerIsOwner) {
 
         this.setSpriteParams(region, currentFrame, centerPosition, highProportion);
 
         //В сетерах надо проверять, существует ли устанавливаемый объект
         this.velocity.set(velocity);
         this.damage = damage;
+        this.playerIsOwner = playerIsOwner;
     }
 
 
@@ -38,5 +43,15 @@ public class Bullet extends BaseSprite {
         }
     }
 
+    public boolean isPlayerIsOwner(){
+        return playerIsOwner;
+    }
 
+    public int getDamage(){
+        return damage;
+    }
+
+    public Vector2 getVelocity(){
+        return velocity;
+    }
 }

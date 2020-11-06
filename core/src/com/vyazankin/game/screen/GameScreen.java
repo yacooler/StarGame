@@ -6,12 +6,19 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.vyazankin.game.base.BaseButton;
 import com.vyazankin.game.base.BaseScreen;
+import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.base.BaseSprite;
+import com.vyazankin.game.math.Rect;
 import com.vyazankin.game.sprite.Background;
-import com.vyazankin.game.sprite.BulletSpritePool;
-import com.vyazankin.game.sprite.EnemyShipPooler;
+import com.vyazankin.game.sprite.Bullet;
+import com.vyazankin.game.sprite.Explosion;
+import com.vyazankin.game.sprite.GameOver;
+import com.vyazankin.game.spritepools.BulletSpritePool;
+import com.vyazankin.game.spritepools.EnemyShipPooler;
 import com.vyazankin.game.sprite.EnemySpaceShip;
+import com.vyazankin.game.spritepools.ExplosionSpritePool;
 import com.vyazankin.game.sprite.PlayerSpaceShip;
 import com.vyazankin.game.sprite.Star;
 
@@ -30,8 +37,10 @@ public class GameScreen extends BaseScreen {
     private final int STARS_COUNT = 64;
 
     private PlayerSpaceShip spaceShip;
+    private GameOver gameOverMessage;
 
     private BulletSpritePool bulletSpritePool;
+    private ExplosionSpritePool explosionSpritePool;
 
     public GameScreen(Game game) {
         super(game);
@@ -39,17 +48,27 @@ public class GameScreen extends BaseScreen {
 
     private EnemyShipPooler enemyShipPooler;
 
+    private BaseButton newGame;
+
     private int MAX_SHIPS = 15;
 
     Sound shootSound;
     Sound enemyShootSound;
+    Sound explosionSound;
+
+    private boolean started;
+
+    Rect hitBox;
+
     @Override
     public void show() {
         super.show();
 
+        hitBox = new Rect();
+
         shootSound =  Gdx.audio.newSound(Gdx.files.internal("resources/sounds/laser.wav"));
         enemyShootSound = Gdx.audio.newSound(Gdx.files.internal("resources/sounds/bullet.wav"));
-
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("resources/sounds/explosion.wav"));
         //Пул спрайтов - пуль
         bulletSpritePool = new BulletSpritePool();
 
@@ -66,10 +85,16 @@ public class GameScreen extends BaseScreen {
         //Пул по умолчанию
         addSpriteToDefaultPool(background, true);
 
+        //Взрывы
+        explosionSpritePool = new ExplosionSpritePool(mainAtlas, explosionSound);
+
         //Пуллер кораблей - класс, отвечающий за создание вражеских кораблей. Наследуется от BaseSpritePool
-        enemyShipPooler = new EnemyShipPooler(mainAtlas, bulletSpritePool, enemyShootSound);
+        enemyShipPooler = new EnemyShipPooler(mainAtlas, bulletSpritePool, explosionSpritePool, enemyShootSound);
         addSpritePool(enemyShipPooler);
 
+
+        //Взрывы рисуются поверх кораблей, поэтому добавляем их последними
+        addSpritePool(explosionSpritePool);
 
         //Пролетающие на заднем фоне звёзды находятся в пуле по умолчанию
         stars = new ArrayList<>(STARS_COUNT);
@@ -82,17 +107,47 @@ public class GameScreen extends BaseScreen {
 
 
         //Корабль игрока, находится в пуле по умолчанию
-        spaceShip = new PlayerSpaceShip(mainAtlas, bulletSpritePool, shootSound);
+        spaceShip = new PlayerSpaceShip(mainAtlas, bulletSpritePool, explosionSpritePool, shootSound);
 
         addSpriteToDefaultPool(spaceShip, true);
+
         addInputListener(spaceShip);
+
+        //Спрайт окончания игры
+        gameOverMessage = new GameOver(mainAtlas.findRegion("message_game_over"));
+        gameOverMessage.setHeightProportion(0.1f);
+
+
+        //Кнопка Новая игра
+        newGame = new BaseButton(mainAtlas.findRegion("button_new_game")) {
+            @Override
+            public void action() {
+                System.out.println("action");
+                startNewGame();
+            }
+
+            @Override
+            protected void worldResize(Rect bounds) {
+                super.worldResize(bounds);
+                newGame.setHeightProportion(0.1f);
+                newGame.setBottom(worldBounds.getBottom() + newGame.getFullHeight() *2f );
+            }
+        };
+        addInputListener(newGame);
+
+        started = true;
 
     }
 
 
+
     @Override
     protected void recalc(float deltaTime) {
+
         super.recalc(deltaTime);
+
+        if (!started) return;
+
         int ships;
 
         ships = enemyShipPooler.getActiveSpritesList().size();
@@ -123,11 +178,71 @@ public class GameScreen extends BaseScreen {
         super.dispose();
         shootSound.dispose();
         enemyShootSound.dispose();
+        explosionSound.dispose();
     }
 
 
 
+    @Override
+    protected boolean checks() {
+        boolean retValue = false;
+        //Корабли противника vs наш корабль
+        for (EnemySpaceShip ship: enemyShipPooler.getActiveSpritesList()) {
+            if (!ship.isActive()) continue;
+            if(spaceShip.getCenterPosition().dst(ship.getCenterPosition()) < (Math.min(spaceShip.getHalfHeight(), ship.getHalfHeight()))){
+                spaceShip.damage(ship.getShipHealth());
+                ship.damage(ship.getShipHealth());
+                retValue = true;
+            }
+            //Попадание пуль
+            for (Bullet bullet: bulletSpritePool.getActiveSpritesList()){
+                if (!bullet.isActive()) continue;
+                BaseShip baseShip;
 
+                //Пули игрока или противника
+                if (bullet.isPlayerIsOwner()) {
+                    baseShip = ship;
+                } else {
+                    baseShip = spaceShip;
+                }
 
+                //Получаем размер корабля и немного уменьшаем его для получения хитбокса
+                if (hitBox.clone(baseShip).scale(0.85f).isVectorInside(bullet.getCenterPosition())) {
+                    baseShip.damage(bullet.getDamage());
+                    bullet.setActive(false);
+                    Explosion explosion = explosionSpritePool.poolNewOrInactiveSprite();
+                    explosion.set(bullet.getCenterPosition(), bullet.getFullWidth() * 3f);
+                    explosion.setActive(true);
+                    explosionSpritePool.addSpriteIntoActive(explosion);
+                    retValue = true;
+                }
 
+            }
+        }
+
+        //Если игрок проиграл
+        if (!spaceShip.isActive()){
+            gameOver();
+        }
+
+        return retValue;
+    }
+
+    private void gameOver(){
+        started = false;
+        bulletSpritePool.forceInactive();
+        enemyShipPooler.forceInactive();
+        addSpriteToDefaultPool(gameOverMessage, true);
+        addSpriteToDefaultPool(newGame, true);
+        spaceShip.setActive(false);
+    }
+
+    private void startNewGame(){
+        spaceShip.reset();
+        spaceShip.setActive(true);
+        addSpriteToDefaultPool(spaceShip, true);
+        gameOverMessage.setActive(false);
+        newGame.setActive(false);
+        started = true;
+    }
 }
