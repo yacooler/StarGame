@@ -1,9 +1,6 @@
 package com.vyazankin.game.base;
 
 import com.badlogic.gdx.math.Vector2;
-import com.vyazankin.game.math.Rect;
-
-import java.util.function.Predicate;
 
 /**
  * Интерфейс, позволяющий подписать объект на получение событий от BaseScreen

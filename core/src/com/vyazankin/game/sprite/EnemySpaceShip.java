@@ -4,8 +4,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.dao.EnemyShipDAO;
-import com.vyazankin.game.math.RandomBounds;
-import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.utils.RandomBounds;
+import com.vyazankin.game.base.Rect;
 import com.vyazankin.game.spritepools.BulletSpritePool;
 import com.vyazankin.game.spritepools.ExplosionSpritePool;
 import com.vyazankin.game.utils.TextureUtils;
@@ -19,7 +19,7 @@ public class EnemySpaceShip extends BaseShip {
     private float velocityScaler = 10f;
 
     //Первый выстрел на позиции, когда видна 1/5 корпуса корабля
-    private float firstShootPosition = 1f;
+    private float firstShootPosition = 1/5f;
 
 
     public EnemySpaceShip(TextureAtlas mainAtlas, BulletSpritePool bulletSpritePool, ExplosionSpritePool explosionSpritePool, Sound shootSound) {

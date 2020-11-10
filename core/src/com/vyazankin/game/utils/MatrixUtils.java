@@ -1,7 +1,8 @@
-package com.vyazankin.game.math;
+package com.vyazankin.game.utils;
 
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
+import com.vyazankin.game.base.Rect;
 
 public class MatrixUtils {
 

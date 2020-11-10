@@ -13,8 +13,8 @@ public abstract class BaseShip extends BaseSprite {
 
     //Параметры корабля
     private float shipSize;
-    private float shipMaxVelocity;
     private int shipHealth;
+    private int shipMaxHealth;
     private float shipRateOfFire;
 
 
@@ -57,7 +57,6 @@ public abstract class BaseShip extends BaseSprite {
             Sound shootSound,
 
             float shipSize,
-            float shipMaxVelocity,
             int shipHealth,
             float shootSoundVolume,
 
@@ -74,9 +73,8 @@ public abstract class BaseShip extends BaseSprite {
         this.shootSoundVolume = shootSoundVolume;
 
         this.shipSize = shipSize;
-        this.shipMaxVelocity = shipMaxVelocity;
         this.shipHealth = shipHealth;
-
+        this.shipMaxHealth = shipHealth;
         this.shipRateOfFire = shipRateOfFire;
         this.bulletVelocity = bulletVelocity;
         this.bulletSize = bulletSize;
@@ -108,8 +106,8 @@ public abstract class BaseShip extends BaseSprite {
         this.shootSoundVolume = shootSoundVolume;
 
         this.shipSize = shipSize;
-        this.shipMaxVelocity = shipMaxVelocity;
         this.shipHealth = shipHealth;
+        this.shipMaxHealth = shipHealth;
 
         this.shipRateOfFire = shipRateOfFire;
         this.bulletVelocity = bulletVelocity;
@@ -190,6 +188,7 @@ public abstract class BaseShip extends BaseSprite {
         damageTimer = 0f;
         shipHealth -= damage;
         if (shipHealth <= 0){
+            shipHealth = 0;
             destroy();
         }
     }
@@ -205,6 +204,6 @@ public abstract class BaseShip extends BaseSprite {
     public int getShipHealth(){
         return shipHealth;
     }
-
+    public int getShipMaxHealth() {return shipMaxHealth; }
 
 }

@@ -9,8 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.vyazankin.game.math.MatrixUtils;
-import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.utils.MatrixUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -47,7 +46,8 @@ public abstract class BaseScreen implements Screen, InputProcessor {
     //protected Set<BaseSprite> sprites = new LinkedHashSet<>();
 
     //В спрайт-пул по умолчанию добавляются спрайты фона и другие одиночные спрайты
-    private BaseSpritePool<BaseSprite> defaultSpritePool;
+    private DefaultSpritePool<BaseSprite> defaultSpritePool;
+
 
     //Спрайт-пулы конкретных объектов
     private List<BaseSpritePool<? extends BaseSprite>> baseSpritePoolList;
@@ -69,21 +69,27 @@ public abstract class BaseScreen implements Screen, InputProcessor {
 
     /*------------------------------------------Секция работы со спрайтами-----------------------------*/
 
-    /**
-     * Добавление спрайта в пул по умолчанию
-     * @param sprite
-     */
-    public void addSpriteToDefaultPool(BaseSprite sprite) {
-        defaultSpritePool.addSpriteIntoActive(sprite);
-    }
 
-    public void addSpriteToDefaultPool(BaseSprite sprite, boolean active) {
-        defaultSpritePool.addSpriteIntoActive(sprite);
+    /**
+     *Добавление спрайта в пул с возможностью указания положения и активности
+     */
+    public void addSpriteToDefaultPool(BaseSprite sprite, DefaultPoolSpriteLayout layout, boolean active) {
+        defaultSpritePool.addSpriteIntoActive(sprite, layout);
         sprite.setActive(active);
     }
 
-    public void addSpriteIntoActiveToDefaultPool(BaseSprite sprite){
-        defaultSpritePool.addSpriteIntoActive(sprite);
+    /**
+     * Добавление спрайта на задний фон с возможностью указания активности
+     */
+    public void addSpriteToDefaultPoolBackground(BaseSprite sprite, boolean active) {
+        defaultSpritePool.addSpriteIntoActive(sprite, DefaultPoolSpriteLayout.BACKGROUND);
+        sprite.setActive(active);
+    }
+
+
+    //Добавление активного спрайта на передний фон
+    public void addSpriteIntoActiveToDefaultPoolForeground(BaseSprite sprite){
+        addSpriteToDefaultPool(sprite, DefaultPoolSpriteLayout.FOREGROUND, true);
     }
 
     /**
@@ -101,7 +107,7 @@ public abstract class BaseScreen implements Screen, InputProcessor {
         baseSpritePoolList.add(pool);
         if (worldBounds != null) {
             pool.worldResize(worldBounds);
-            System.out.println("WB -> pool");
+            //System.out.println("WB -> pool");
         }
     }
 
@@ -123,15 +129,11 @@ public abstract class BaseScreen implements Screen, InputProcessor {
         worldTouchPosition = new Vector2();
 
         //Для хранения спрайтов, не требующих повторного использования
-        defaultSpritePool = new BaseSpritePool<BaseSprite>() {
-            @Override
-            protected BaseSprite obtainSprite() {
-                throw new UnsupportedOperationException("Запрещено динамическое добавление спрайтов в пул по умолчанию!");
-            }
-        };
+        defaultSpritePool = new DefaultSpritePool<>();
 
         //Для хранения пулов спрайтов
         baseSpritePoolList = new ArrayList<>();
+
         addSpritePool(defaultSpritePool);
 
     }
@@ -153,10 +155,20 @@ public abstract class BaseScreen implements Screen, InputProcessor {
         }
 
         //Отрисовываем пулы
+        //Сперва бэкграунд пула по умолчанию, в самом конце - его foregreound спрайты
         batch.begin();
+
+        defaultSpritePool.setDrawLayout(DefaultPoolSpriteLayout.BACKGROUND);
+        defaultSpritePool.draw(batch);
+
         for (BaseSpritePool pool: baseSpritePoolList) {
+            if (pool == defaultSpritePool) continue;
             pool.draw(batch);
         }
+
+        defaultSpritePool.setDrawLayout(DefaultPoolSpriteLayout.FOREGROUND);
+        defaultSpritePool.draw(batch);
+
         batch.end();
 
     }
@@ -166,8 +178,16 @@ public abstract class BaseScreen implements Screen, InputProcessor {
      * @param deltaTime
      */
     protected void recalc(float deltaTime){
-        checks();
+        if (checks()) collisionHappens();
     }
+
+    /**
+     * Если checks вернул true - можем обработать на потомке
+     * */
+    protected void collisionHappens(){
+
+    }
+
 
     @Override
     public void resize(int width, int height) {
@@ -219,6 +239,7 @@ public abstract class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
+        System.out.println("Base screen dispose");
         //Диспозим спрайты
         for (BaseSpritePool pool : baseSpritePoolList){
             pool.dispose();
@@ -347,7 +368,6 @@ public abstract class BaseScreen implements Screen, InputProcessor {
      * Проверка столкновений
      */
     protected boolean checks(){return false;};
-
 
 
 }

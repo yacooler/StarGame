@@ -3,8 +3,8 @@ package com.vyazankin.game.sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.base.BaseSprite;
-import com.vyazankin.game.math.RandomBounds;
-import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.utils.RandomBounds;
+import com.vyazankin.game.base.Rect;
 
 public class Star extends BaseSprite {
 

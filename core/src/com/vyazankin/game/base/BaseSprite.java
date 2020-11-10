@@ -3,10 +3,6 @@ package com.vyazankin.game.base;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.vyazankin.game.math.Rect;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 
 abstract public class BaseSprite extends Rect {
@@ -116,6 +112,7 @@ abstract public class BaseSprite extends Rect {
      * Освобождаем текстуры
      */
     public void dispose(){
+        System.out.println("Base sprite dispose");
         if (textureRegions!=null) {
             for (TextureRegion region : textureRegions) {
                 if (region!=null && region.getTexture() != null) region.getTexture().dispose();
