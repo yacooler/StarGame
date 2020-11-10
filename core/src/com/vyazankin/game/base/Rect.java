@@ -1,4 +1,4 @@
-package com.vyazankin.game.math;
+package com.vyazankin.game.base;
 
 import com.badlogic.gdx.math.Vector2;
 

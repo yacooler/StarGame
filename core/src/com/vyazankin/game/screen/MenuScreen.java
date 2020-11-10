@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.vyazankin.game.base.BaseButton;
 import com.vyazankin.game.base.BaseScreen;
 import com.vyazankin.game.base.BaseSprite;
-import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.base.Rect;
 import com.vyazankin.game.sprite.Background;
 import com.vyazankin.game.sprite.Star;
 
@@ -58,14 +58,14 @@ public class MenuScreen extends BaseScreen {
         };
 
         //Спрайты отрисовываются в последовательности добавления!
-        addSpriteToDefaultPool(background, true);
+        addSpriteToDefaultPoolBackground(background, true);
 
         stars = new ArrayList<>(STARS_COUNT);
         for (int i = 0; i < STARS_COUNT; i++) {
             Star star;
             star = new Star(new TextureRegion(menuAtlas.findRegion("star")));
             stars.add(star);
-            addSpriteToDefaultPool(star, true);
+            addSpriteToDefaultPoolBackground(star, true);
         }
 
         addInputListener(closeButton);
@@ -73,8 +73,8 @@ public class MenuScreen extends BaseScreen {
 
 
         //Отрисовываются в последовательности добавления!
-        addSpriteToDefaultPool(closeButton, true);
-        addSpriteToDefaultPool(playButton, true);
+        addSpriteToDefaultPoolBackground(closeButton, true);
+        addSpriteToDefaultPoolBackground(playButton, true);
 
     }
 

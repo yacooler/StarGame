@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.vyazankin.game.base.BaseShip;
 import com.vyazankin.game.base.InputListener;
-import com.vyazankin.game.math.Rect;
+import com.vyazankin.game.base.Rect;
 import com.vyazankin.game.spritepools.BulletSpritePool;
 import com.vyazankin.game.spritepools.ExplosionSpritePool;
 import com.vyazankin.game.utils.TextureUtils;
@@ -43,7 +43,6 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
                 shootSound,
 
                 SHIP_SIZE,
-                MAX_SHIP_VELOCITY,
                 SHIP_HEALTH,
                 SHOOT_SOUND_VOLUME,
                 SHIP_RATE_OF_FIRE,
@@ -74,6 +73,10 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
                 BULLET_DAMAGE);
 
         velocity_vector.set(0,0);
+        isLeftPressed = false;
+        isRightPressed = false;
+        isLeftTouched = UNKNOWN_POINTER;
+        isRightTouched = UNKNOWN_POINTER;
     }
 
 
@@ -105,6 +108,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
 
     @Override
     public void touchDown(Vector2 worldTouchPosition, int pointer, int button) {
+        if (!isActive()) return;
         if (worldTouchPosition.x < getActualSpriteWorldBound().getCenterPosition().x){
             isLeftTouched = pointer;
             moveLeft();
@@ -116,6 +120,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
 
     @Override
     public void touchUp(Vector2 worldTouchPosition, int pointer, int button) {
+        if (!isActive()) return;
         if (isLeftTouched == pointer){
             isLeftTouched = UNKNOWN_POINTER;
             if (isRightTouched != UNKNOWN_POINTER){
@@ -136,6 +141,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
 
     @Override
     public boolean keyDown(int keycode) {
+        if (!isActive()) return false;
         switch (keycode){
             case Input.Keys.A:
             case Input.Keys.LEFT:
@@ -153,6 +159,7 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
 
     @Override
     public boolean keyUp(int keycode) {
+        if (!isActive()) return false;
         switch (keycode){
             case Input.Keys.A:
             case Input.Keys.LEFT:
@@ -193,7 +200,6 @@ public class PlayerSpaceShip extends BaseShip implements InputListener {
 
     @Override
     public void dispose() {
-        shootSound.dispose();
         super.dispose();
     }
 }

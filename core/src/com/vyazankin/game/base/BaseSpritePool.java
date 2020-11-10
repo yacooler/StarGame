@@ -1,14 +1,10 @@
 package com.vyazankin.game.base;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.vyazankin.game.math.Rect;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 public abstract class BaseSpritePool<T extends BaseSprite> {
 
@@ -141,6 +137,7 @@ public abstract class BaseSpritePool<T extends BaseSprite> {
     }
 
     public void dispose(){
+        System.out.println("Base sprite pool dispose");
         //Вызывает диспоз на всех спрайтах пулов
         for (T sprite: activeSprites) {
             sprite.dispose();
